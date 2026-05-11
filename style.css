@@ -810,3 +810,17 @@ body {
   .section-header h2 { font-size: 20px; }
   .toast { min-width: auto; }
 }
+
+/* Late payments bar */
+.late-bar {
+  background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2));
+  border-bottom: 1px solid var(--accent-danger);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.late-bar-title { font-weight: 700; color: var(--accent-danger); white-space: nowrap; }
+#latePaymentsList { color: var(--text-primary); font-weight: 600; }
