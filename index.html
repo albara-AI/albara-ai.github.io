@@ -4,127 +4,107 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>نظام إدارة الزيت والجبنة</title>
-  
-  <!-- خط Cairo من Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ========== الشريط العلوي ========== -->
   <header class="topbar">
     <div class="logo">
       <span class="logo-icon">🛢️</span>
       <span class="logo-text">نظام الإدارة</span>
     </div>
-  
     <div class="stats-pill">
-      <span class="stats-label">إجمالي التنكات</span>
+      <span class="stats-label">التنكات المتبقية في المخزن</span>
       <span class="stats-value" id="totalTanksDisplay">0</span>
     </div>
-  
     <div class="connection-status" id="connectionStatus">
       <span class="dot"></span>
       <span class="status-text">جاري الاتصال...</span>
     </div>
   </header>
 
-  <!-- ========== التبويبات ========== -->
+  <!-- إشعارات الزبائن المتأخرين -->
+  <div id="latePaymentsBar" class="late-bar" style="display:none">
+    <span class="late-bar-title">⚠️ زبائن لم يدفعوا قبل نهاية الشهر:</span>
+    <span id="latePaymentsList"></span>
+  </div>
+
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="installments">
-      <span class="tab-icon">💰</span>
-      <span>الأقساط</span>
-    </button>
-    <button class="tab-btn" data-tab="tanks">
-      <span class="tab-icon">🛢️</span>
-      <span>التنكات</span>
-    </button>
-    <button class="tab-btn" data-tab="purchases">
-      <span class="tab-icon">🚚</span>
-      <span>شراء الزيت</span>
-    </button>
-    <button class="tab-btn" data-tab="cheese">
-      <span class="tab-icon">🧀</span>
-      <span>الجبنة</span>
-    </button>
-    <button class="tab-btn" data-tab="cheeseDetails">
-      <span class="tab-icon">📋</span>
-      <span>تفاصيل الجبنة</span>
-    </button>
-    <button class="tab-btn" data-tab="search">
-      <span class="tab-icon">🔍</span>
-      <span>البحث</span>
-    </button>
-    <button class="tab-btn" data-tab="settings">
-      <span class="tab-icon">⚙️</span>
-      <span>الإعدادات</span>
-    </button>
+    <button class="tab-btn active" data-tab="installments"><span class="tab-icon">💰</span><span>الأقساط</span></button>
+    <button class="tab-btn" data-tab="tanks"><span class="tab-icon">🛢️</span><span>التنكات</span></button>
+    <button class="tab-btn" data-tab="purchases"><span class="tab-icon">🚚</span><span>شراء الزيت</span></button>
+    <button class="tab-btn" data-tab="cheese"><span class="tab-icon">🧀</span><span>الجبنة</span></button>
+    <button class="tab-btn" data-tab="cheeseDetails"><span class="tab-icon">📋</span><span>تفاصيل الجبنة</span></button>
+    <button class="tab-btn" data-tab="transfers"><span class="tab-icon">💸</span><span>تحويلات</span></button>
+    <button class="tab-btn" data-tab="search"><span class="tab-icon">🔍</span><span>البحث</span></button>
+    <button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span><span>الإعدادات</span></button>
   </nav>
 
-  <!-- ========== المحتوى الرئيسي ========== -->
   <main class="container">
 
-    <!-- ========== قسم الأقساط ========== -->
+    <!-- ========== الأقساط ========== -->
     <section class="tab-content active" id="tab-installments">
       <div class="section-header">
         <h2>إدارة الأقساط (الزيت)</h2>
         <p class="section-subtitle">إدخال دفعات الأقساط ومتابعة المتبقي لكل زبون</p>
       </div>
-
-      <!-- نموذج إدخال قسط -->
       <div class="card">
-        <h3 class="card-title">➕ إضافة قسط جديد</h3>
-      
+        <h3 class="card-title">➕ إضافة قسط / دفع كاش</h3>
         <div class="form-grid">
           <div class="form-group">
-            <label>الاسم</label>
-            <input type="text" id="inst_name" list="usersList" placeholder="ابحث أو أضف اسم جديد">
+            <label>الاسم أو الرقم</label>
+            <input type="text" id="inst_name" list="usersList" placeholder="ابحث بالاسم أو ID">
             <datalist id="usersList"></datalist>
           </div>
-        
           <div class="form-group">
-            <label>القسط المدفوع (د.أ)</label>
-            <input type="number" id="inst_amount" step="0.01" placeholder="0.00">
+            <label>نوع الدفع</label>
+            <select id="inst_type" onchange="toggleInstallmentType()">
+              <option value="installment">قسط شهري</option>
+              <option value="cash_payment">دفع تنك كاش</option>
+            </select>
           </div>
-        
-          <div class="form-group">
+          <div class="form-group" id="inst_month_group">
             <label>الشهر المدفوع عنه</label>
             <input type="month" id="inst_month">
           </div>
-        
+          <div class="form-group" id="inst_tank_ref_group" style="display:none">
+            <label>رقم تسجيل التنك الكاش</label>
+            <select id="inst_tank_ref">
+              <option value="">اختر التنك...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>المبلغ المدفوع (د.أ)</label>
+            <input type="number" id="inst_amount" step="0.01" placeholder="0.00">
+          </div>
           <div class="form-group">
             <label>طريقة الدفع</label>
             <select id="inst_method">
-              <option value="manual">يدوي</option>
+              <option value="manual">يدوي (نقدي)</option>
               <option value="electronic">إلكتروني (كليك)</option>
             </select>
           </div>
-        
           <div class="form-group full-width">
             <label>ملاحظات</label>
-            <textarea id="inst_notes" rows="2" placeholder="أي ملاحظات..."></textarea>
+            <textarea id="inst_notes" rows="2" placeholder="اختياري..."></textarea>
           </div>
         </div>
-      
-        <button class="btn btn-primary" id="addInstallmentBtn">
-          💾 حفظ القسط
-        </button>
+        <button class="btn btn-primary" id="addInstallmentBtn">💾 حفظ</button>
       </div>
-
-      <!-- جدول الأقساط -->
       <div class="card">
-        <h3 class="card-title">📋 سجل الأقساط</h3>
+        <h3 class="card-title">📋 سجل الأقساط والمدفوعات</h3>
         <div class="table-wrapper">
           <table class="data-table" id="installmentsTable">
             <thead>
               <tr>
                 <th>الاسم</th>
-                <th>القسط المدفوع</th>
-                <th>الشهر</th>
-                <th>المبلغ المتبقي</th>
+                <th>النوع</th>
+                <th>المبلغ</th>
+                <th>الشهر / مرجع التنك</th>
+                <th>المتبقي</th>
                 <th>طريقة الدفع</th>
                 <th>التاريخ</th>
                 <th>إجراء</th>
@@ -136,75 +116,79 @@
       </div>
     </section>
 
-    <!-- ========== قسم التنكات ========== -->
+    <!-- ========== التنكات ========== -->
     <section class="tab-content" id="tab-tanks">
       <div class="section-header">
         <h2>إدارة التنكات</h2>
-        <p class="section-subtitle">تسجيل التنكات لكل دفعة زيت</p>
+        <p class="section-subtitle">تسجيل التنكات لكل زبون مع التمييز بين الكاش والأقساط</p>
       </div>
 
-      <!-- بطاقات الإحصائيات -->
+      <!-- إحصائيات المخزن -->
       <div class="stats-grid">
-        <div class="stat-card stat-cash">
-          <div class="stat-label">تنكات الكاش</div>
-          <input type="number" class="stat-input" id="cashTanksInput" placeholder="0">
-          <button class="btn-mini" id="saveCashTanksBtn">💾 حفظ</button>
+        <div class="stat-card stat-total">
+          <div class="stat-label">إجمالي المُستلم من المورد</div>
+          <div class="stat-value" id="totalReceivedDisplay">0</div>
         </div>
         <div class="stat-card stat-installments">
-          <div class="stat-label">تنكات الأقساط (محسوب تلقائياً)</div>
-          <div class="stat-value" id="installmentTanksDisplay">0</div>
+          <div class="stat-label">إجمالي المُباع (أقساط + كاش)</div>
+          <div class="stat-value" id="totalSoldDisplay">0</div>
         </div>
-        <div class="stat-card stat-total">
-          <div class="stat-label">الإجمالي</div>
-          <div class="stat-value" id="totalTanksValueDisplay">0</div>
+        <div class="stat-card stat-cash">
+          <div class="stat-label">المتبقي في المخزن</div>
+          <div class="stat-value" id="stockRemainingDisplay">0</div>
         </div>
       </div>
 
-      <!-- نموذج إدخال تنك -->
       <div class="card">
         <h3 class="card-title">➕ إضافة تسجيل تنك</h3>
-      
         <div class="form-grid">
           <div class="form-group">
-            <label>الاسم</label>
-            <input type="text" id="tank_name" list="usersList" placeholder="اسم الزبون">
+            <label>الاسم أو الرقم</label>
+            <input type="text" id="tank_name" list="usersList" placeholder="ابحث بالاسم أو ID">
           </div>
-        
           <div class="form-group">
-            <label>رقم دفعة الزيت</label>
-            <input type="text" id="tank_batch" placeholder="مثال: B-001">
+            <label>نوع التنك</label>
+            <select id="tank_type">
+              <option value="installment">أقساط</option>
+              <option value="cash">كاش</option>
+            </select>
           </div>
-        
+          <div class="form-group">
+            <label>اختر الدفعة</label>
+            <select id="tank_batch">
+              <option value="">اختر دفعة من المورد...</option>
+            </select>
+          </div>
           <div class="form-group">
             <label>عدد التنكات</label>
-            <input type="number" id="tank_count" step="1" placeholder="0">
+            <input type="number" id="tank_count" step="1" min="1" placeholder="0">
           </div>
-
           <div class="form-group">
             <label>سعر التنك (د.أ)</label>
             <input type="number" id="tank_price" step="0.01" placeholder="0.00">
           </div>
-          
           <div class="form-group full-width">
             <label>ملاحظات</label>
             <input type="text" id="tank_notes" placeholder="اختياري">
           </div>
         </div>
-      
         <button class="btn btn-primary" id="addTankBtn">💾 حفظ التسجيل</button>
       </div>
 
-      <!-- جدول التنكات -->
       <div class="card">
         <h3 class="card-title">📋 سجل التنكات</h3>
         <div class="table-wrapper">
           <table class="data-table" id="tanksTable">
             <thead>
               <tr>
+                <th>ID</th>
                 <th>الاسم</th>
-                <th>رقم الدفعة</th>
-                <th>عدد التنكات</th>
-                <th>التاريخ والوقت</th>
+                <th>النوع</th>
+                <th>الدفعة</th>
+                <th>العدد</th>
+                <th>السعر</th>
+                <th>حالة الدفع (كاش)</th>
+                <th>التاريخ</th>
                 <th>إجراء</th>
               </tr>
             </thead>
@@ -213,59 +197,50 @@
         </div>
       </div>
 
-      <!-- ملخص الدفعات -->
       <div class="card">
         <h3 class="card-title">📊 ملخص الدفعات</h3>
         <div id="batchesSummary" class="batches-summary"></div>
       </div>
     </section>
 
-    <!-- ========== قسم شراء الزيت ========== -->
+    <!-- ========== شراء الزيت ========== -->
     <section class="tab-content" id="tab-purchases">
       <div class="section-header">
         <h2>شراء الزيت من المورّد</h2>
-        <p class="section-subtitle">تسجيل عمليات الشراء ومقارنتها مع المبيعات</p>
+        <p class="section-subtitle">تسجيل الدفعات الواردة من المورد</p>
       </div>
-
       <div class="card">
-        <h3 class="card-title">➕ إضافة عملية شراء</h3>
-      
+        <h3 class="card-title">➕ إضافة دفعة من المورد</h3>
         <div class="form-grid">
           <div class="form-group">
             <label>اسم المورّد</label>
             <input type="text" id="pur_supplier" placeholder="اسم الشخص">
           </div>
-        
           <div class="form-group">
             <label>رقم الدفعة</label>
-            <input type="text" id="pur_batch" placeholder="مثال: B-001">
+            <input type="number" id="pur_batch" min="1" placeholder="1">
           </div>
-        
           <div class="form-group">
             <label>عدد التنكات</label>
             <input type="number" id="pur_count" step="1" placeholder="0">
           </div>
-        
           <div class="form-group full-width">
             <label>ملاحظات</label>
             <input type="text" id="pur_notes" placeholder="اختياري">
           </div>
         </div>
-      
-        <button class="btn btn-primary" id="addPurchaseBtn">💾 حفظ الشراء</button>
+        <button class="btn btn-primary" id="addPurchaseBtn">💾 حفظ</button>
       </div>
-
-      <!-- جدول الشراء -->
       <div class="card">
         <h3 class="card-title">📋 سجل المشتريات</h3>
         <div class="table-wrapper">
           <table class="data-table" id="purchasesTable">
             <thead>
               <tr>
-                <th>تاريخ اليوم</th>
-                <th>اسم الشخص</th>
                 <th>رقم الدفعة</th>
+                <th>اسم المورد</th>
                 <th>عدد التنكات</th>
+                <th>التاريخ</th>
                 <th>إجراء</th>
               </tr>
             </thead>
@@ -273,68 +248,50 @@
           </table>
         </div>
       </div>
-
-      <!-- تقرير المطابقة -->
       <div class="card">
-        <h3 class="card-title">⚖️ تقرير المطابقة (شراء vs مبيع)</h3>
+        <h3 class="card-title">⚖️ تقرير المطابقة</h3>
         <div id="matchingReport"></div>
       </div>
     </section>
 
-    <!-- ========== قسم الجبنة ========== -->
+    <!-- ========== الجبنة ========== -->
     <section class="tab-content" id="tab-cheese">
       <div class="section-header">
         <h2>إدارة الجبنة</h2>
-        <p class="section-subtitle">تسجيل عمليات بيع الجبنة بالدفعات</p>
+        <p class="section-subtitle">تسجيل عمليات بيع الجبنة</p>
       </div>
-
       <div class="card">
-        <h3 class="card-title">➕ إضافة عملية بيع جبنة</h3>
-      
+        <h3 class="card-title">➕ إضافة عملية جبنة</h3>
         <div class="form-grid">
           <div class="form-group">
-            <label>الاسم</label>
-            <input type="text" id="ch_name" list="usersList" placeholder="اسم الزبون">
+            <label>الاسم أو الرقم</label>
+            <input type="text" id="ch_name" list="usersList" placeholder="ابحث بالاسم أو ID">
           </div>
-        
           <div class="form-group">
             <label>رقم الدفعة</label>
             <input type="text" id="ch_batch" placeholder="مثال: C-001">
           </div>
-        
           <div class="form-group">
-            <label>النقود المدفوعة (د.أ)</label>
+            <label>المدفوع (د.أ)</label>
             <input type="number" id="ch_paid" step="0.01" placeholder="0.00">
           </div>
-        
           <div class="form-group">
-            <label>المبلغ الإجمالي (د.أ)</label>
+            <label>الإجمالي (د.أ)</label>
             <input type="number" id="ch_total" step="0.01" placeholder="0.00">
           </div>
-        
           <div class="form-group full-width">
             <label>ملاحظات</label>
             <input type="text" id="ch_notes" placeholder="اختياري">
           </div>
         </div>
-      
         <button class="btn btn-primary" id="addCheeseBtn">💾 حفظ</button>
       </div>
-
       <div class="card">
-        <h3 class="card-title">📋 سجل بيع الجبنة</h3>
+        <h3 class="card-title">📋 سجل الجبنة</h3>
         <div class="table-wrapper">
           <table class="data-table" id="cheeseTable">
             <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>رقم الدفعة</th>
-                <th>المدفوع</th>
-                <th>الإجمالي</th>
-                <th>المتبقي</th>
-                <th>التاريخ</th>
-                <th>إجراء</th>
-              </tr>
+              <tr><th>الاسم</th><th>الدفعة</th><th>المدفوع</th><th>الإجمالي</th><th>المتبقي</th><th>التاريخ</th><th>إجراء</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -342,66 +299,43 @@
       </div>
     </section>
 
-    <!-- ========== قسم تفاصيل الجبنة ========== -->
+    <!-- ========== تفاصيل الجبنة ========== -->
     <section class="tab-content" id="tab-cheeseDetails">
       <div class="section-header">
         <h2>تفاصيل الجبنة (الأنصاف)</h2>
-        <p class="section-subtitle">تفصيل الأنصاف لكل دفعة جبنة</p>
       </div>
-
       <div class="card">
         <h3 class="card-title">➕ إضافة تفصيل</h3>
-      
         <div class="form-grid">
           <div class="form-group">
-            <label>الاسم</label>
-            <input type="text" id="chd_name" list="usersList" placeholder="اسم الزبون">
+            <label>الاسم أو الرقم</label>
+            <input type="text" id="chd_name" list="usersList" placeholder="ابحث بالاسم أو ID">
           </div>
-        
           <div class="form-group">
             <label>رقم الدفعة</label>
-            <input type="text" id="chd_batch" placeholder="نفس رقم الدفعة في الجبنة">
+            <input type="text" id="chd_batch" placeholder="نفس رقم دفعة الجبنة">
           </div>
-        
           <div class="form-group">
             <label>عدد الأنصاف</label>
             <input type="number" id="chd_halves" step="1" placeholder="0">
           </div>
-        
           <div class="form-group">
-            <label>هل تم الدفع؟</label>
-            <select id="chd_paid">
-              <option value="no">لا</option>
-              <option value="yes">نعم</option>
-            </select>
+            <label>مدفوع؟</label>
+            <select id="chd_paid"><option value="no">لا</option><option value="yes">نعم</option></select>
           </div>
-        
           <div class="form-group">
             <label>طريقة الدفع</label>
-            <select id="chd_method">
-              <option value="manual">يدوي</option>
-              <option value="electronic">إلكتروني</option>
-            </select>
+            <select id="chd_method"><option value="manual">يدوي</option><option value="electronic">إلكتروني</option></select>
           </div>
         </div>
-      
         <button class="btn btn-primary" id="addCheeseDetailBtn">💾 حفظ</button>
       </div>
-
       <div class="card">
         <h3 class="card-title">📋 سجل التفاصيل</h3>
         <div class="table-wrapper">
           <table class="data-table" id="cheeseDetailsTable">
             <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>رقم الدفعة</th>
-                <th>عدد الأنصاف</th>
-                <th>مدفوع؟</th>
-                <th>طريقة الدفع</th>
-                <th>التاريخ</th>
-                <th>إجراء</th>
-              </tr>
+              <tr><th>الاسم</th><th>الدفعة</th><th>الأنصاف</th><th>مدفوع؟</th><th>طريقة الدفع</th><th>التاريخ</th><th>إجراء</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -409,75 +343,105 @@
       </div>
     </section>
 
-    <!-- ========== قسم البحث ========== -->
+    <!-- ========== التحويلات المالية ========== -->
+    <section class="tab-content" id="tab-transfers">
+      <div class="section-header">
+        <h2>التحويلات المالية الأخرى</h2>
+        <p class="section-subtitle">تسجيل أي تحويلات أو معاملات مالية خارج نطاق الزيت والجبنة</p>
+      </div>
+      <div class="card">
+        <h3 class="card-title">➕ إضافة تحويل</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>الوصف</label>
+            <input type="text" id="tr_desc" placeholder="وصف التحويل">
+          </div>
+          <div class="form-group">
+            <label>المبلغ (د.أ)</label>
+            <input type="number" id="tr_amount" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>النوع</label>
+            <select id="tr_type">
+              <option value="in">وارد (استلام)</option>
+              <option value="out">صادر (دفع)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>طريقة الدفع</label>
+            <select id="tr_method">
+              <option value="manual">يدوي (نقدي)</option>
+              <option value="electronic">إلكتروني</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>ملاحظات</label>
+            <textarea id="tr_notes" rows="2" placeholder="أي تفاصيل إضافية..."></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="addTransferBtn">💾 حفظ</button>
+      </div>
+      <div class="card">
+        <h3 class="card-title">📋 سجل التحويلات</h3>
+        <div class="table-wrapper">
+          <table class="data-table" id="transfersTable">
+            <thead>
+              <tr><th>رقم العملية</th><th>الوصف</th><th>المبلغ</th><th>النوع</th><th>طريقة الدفع</th><th>الملاحظات</th><th>التاريخ</th><th>إجراء</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== البحث ========== -->
     <section class="tab-content" id="tab-search">
       <div class="section-header">
         <h2>البحث والتقارير</h2>
-        <p class="section-subtitle">البحث عن زبون وعرض سجله الكامل</p>
       </div>
-
       <div class="card">
         <h3 class="card-title">🔍 بحث</h3>
         <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="ابحث بالاسم أو User ID...">
+          <input type="text" id="searchInput" placeholder="ابحث بالاسم أو ID...">
           <button class="btn btn-primary" id="searchBtn">بحث</button>
         </div>
       </div>
-
       <div id="searchResults"></div>
     </section>
 
-    <!-- ========== قسم الإعدادات ========== -->
+    <!-- ========== الإعدادات ========== -->
     <section class="tab-content" id="tab-settings">
       <div class="section-header">
         <h2>الإعدادات</h2>
-        <p class="section-subtitle">إعدادات النظام والتصدير</p>
       </div>
-
-      <div class="card">
-        <h3 class="card-title">💰 سعر التنك</h3>
-        <div class="form-group">
-          <label>السعر الحالي (د.أ)</label>
-          <div class="inline-controls">
-            <input type="number" id="tankPriceInput" step="0.01" placeholder="0.00">
-            <button class="btn btn-secondary" id="saveTankPriceBtn">💾 حفظ</button>
-          </div>
-        </div>
-      </div>
-
       <div class="card">
         <h3 class="card-title">🔐 كلمة سر الحذف</h3>
-        <p class="hint">تُستخدم للتأكيد عند حذف أي عملية</p>
         <div class="form-group">
-          <label>كلمة السر</label>
           <div class="inline-controls">
             <input type="password" id="deletePasswordInput" placeholder="••••••">
             <button class="btn btn-secondary" id="saveDeletePasswordBtn">💾 حفظ</button>
           </div>
         </div>
       </div>
-
       <div class="card">
         <h3 class="card-title">📤 تصدير البيانات</h3>
-        <p class="hint">حمّل نسخة Excel (CSV) من بياناتك</p>
         <div class="export-buttons">
           <button class="btn btn-export" onclick="exportToCSV('installments')">⬇️ الأقساط</button>
           <button class="btn btn-export" onclick="exportToCSV('oilTanks')">⬇️ التنكات</button>
           <button class="btn btn-export" onclick="exportToCSV('oilPurchases')">⬇️ المشتريات</button>
           <button class="btn btn-export" onclick="exportToCSV('cheese')">⬇️ الجبنة</button>
-          <button class="btn btn-export" onclick="exportToCSV('cheeseDetails')">⬇️ تفاصيل الجبنة</button>
+          <button class="btn btn-export" onclick="exportToCSV('transfers')">⬇️ التحويلات</button>
         </div>
       </div>
-
       <div class="card">
-        <h3 class="card-title">🔗 إعدادات Apps Script</h3>
+        <h3 class="card-title">🔗 إعدادات الاتصال</h3>
         <div class="form-group">
           <label>رابط Web App URL</label>
           <input type="text" id="apiUrlInput" placeholder="https://script.google.com/...">
         </div>
         <div class="form-group">
           <label>مفتاح الحماية (API Key)</label>
-          <input type="text" id="apiKeyInput" placeholder="نفس المفتاح في Apps Script">
+          <input type="text" id="apiKeyInput" placeholder="API Key">
         </div>
         <button class="btn btn-secondary" id="saveApiSettingsBtn">💾 حفظ الإعدادات</button>
       </div>
@@ -485,10 +449,8 @@
 
   </main>
 
-  <!-- ========== صندوق التنبيهات (Toast) ========== -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ========== نافذة منبثقة عامة ========== -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <h3 id="modalTitle"></h3>
