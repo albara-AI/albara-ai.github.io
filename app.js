@@ -251,8 +251,9 @@ function calcRemaining(userId) {
   const cashPaid = state.installments
     .filter(i => i.userId === userId && i.payType === 'cash_payment')
     .reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
-  const cashTanksPaid = cashTotalDue > 0
-    ? Math.floor(cashPaid / (cashTotalDue / cashTanks))
+  const avgCashPrice = cashTanks > 0 ? cashTotalDue / cashTanks : 0;
+  const cashTanksPaid = avgCashPrice > 0
+    ? Math.floor(cashPaid / avgCashPrice)
     : 0;
   const cashRemaining = cashTotalDue - cashPaid;
 
@@ -264,8 +265,9 @@ function calcRemaining(userId) {
   const installmentsPaid = state.installments
     .filter(i => i.userId === userId && i.payType === 'installment')
     .reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
-  const instTanksPaid = instTotalDue > 0
-    ? Math.floor(installmentsPaid / (instTotalDue / installmentTanks))
+  const avgInstPrice = installmentTanks > 0 ? instTotalDue / installmentTanks : 0;
+  const instTanksPaid = avgInstPrice > 0
+    ? Math.floor(installmentsPaid / avgInstPrice)
     : 0;
   const instRemaining = instTotalDue - installmentsPaid;
 
@@ -276,10 +278,10 @@ function calcRemaining(userId) {
   return {
     // كاش
     cashTanks, cashTotalDue, cashPaid, cashTanksPaid,
-    cashRemaining, cashTanksRemaining: cashTanks - cashTanksPaid,
+    cashRemaining, cashTanksRemaining: Math.max(0, cashTanks - cashTanksPaid),
     // أقساط
     installmentTanks, instTotalDue, installmentsPaid, instTanksPaid,
-    instRemaining, instTanksRemaining: installmentTanks - instTanksPaid,
+    instRemaining, instTanksRemaining: Math.max(0, installmentTanks - instTanksPaid),
     // إجماليات
     tankCount, unpaidCashTanks,
     totalDue: cashTotalDue + instTotalDue,
