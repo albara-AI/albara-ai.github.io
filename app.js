@@ -773,9 +773,40 @@ function performSearch() {
         <div class="summary-item"><div class="label">تنكات أقساط</div><div class="value" style="color:var(--accent-secondary)">${installmentTanks}</div></div>
         <div class="summary-item"><div class="label">تنكات كاش</div><div class="value" style="color:var(--accent-gold)">${cashTanks}</div></div>
         <div class="summary-item"><div class="label">كاش غير مدفوع</div><div class="value" style="color:${unpaidCashTanks > 0 ? 'var(--accent-danger)' : 'var(--accent-primary)'}">${unpaidCashTanks} تنك</div></div>
-        <div class="summary-item"><div class="label">إجمالي المستحق</div><div class="value">${formatMoney(totalDue)}</div></div>
-        <div class="summary-item"><div class="label">المدفوع</div><div class="value" style="color:var(--accent-primary)">${formatMoney(totalPaid)}</div></div>
-        <div class="summary-item"><div class="label">المتبقي</div><div class="value" style="color:${remaining > 0 ? 'var(--accent-warning)' : 'var(--accent-primary)'}">${formatMoney(remaining)}</div></div>
+        <div class="summary-item" style="border-top:2px solid var(--accent-gold)">
+          <div class="label">💵 كاش - المستحق</div><div class="value">${formatMoney(cashTotalDue)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">💵 كاش - المدفوع</div>
+          <div class="value" style="color:var(--accent-primary)">${formatMoney(cashPaid)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">💵 كاش - المتبقي</div>
+          <div class="value" style="color:${cashRemaining > 0 ? 'var(--accent-warning)' : 'var(--accent-primary)'}">
+            ${formatMoney(cashRemaining)}
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="label">💵 تنكات كاش مدفوعة</div>
+          <div class="value">${cashTanksPaid} / ${cashTanks}</div>
+        </div>
+        <div class="summary-item" style="border-top:2px solid var(--accent-secondary)">
+          <div class="label">📅 أقساط - المستحق</div><div class="value">${formatMoney(instTotalDue)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">📅 أقساط - المدفوع</div>
+          <div class="value" style="color:var(--accent-primary)">${formatMoney(installmentsPaid)}</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">📅 أقساط - المتبقي</div>
+          <div class="value" style="color:${instRemaining > 0 ? 'var(--accent-warning)' : 'var(--accent-primary)'}">
+            ${formatMoney(instRemaining)}
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="label">📅 تنكات أقساط مدفوعة</div>
+          <div class="value">${instTanksPaid} / ${installmentTanks}</div>
+        </div>
         ${unpaidCashTanks > 0 ? `<div class="summary-item" style="border:1px solid var(--accent-danger)"><div class="label">⚠️ تنبيه</div><div class="value" style="font-size:14px;color:var(--accent-danger)">يوجد ${unpaidCashTanks} تنك كاش لم يُدفع</div></div>` : ''}
       </div>
 
