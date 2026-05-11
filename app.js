@@ -761,7 +761,9 @@ function performSearch() {
   if (!matched.length) { res.innerHTML = '<p style="color:var(--accent-warning);padding:24px;text-align:center">لم يُعثر على زبون</p>'; return; }
 
   res.innerHTML = matched.map(user => {
-    const { totalDue, totalPaid, remaining, tankCount, installmentTanks, cashTanks, unpaidCashTanks } = calcRemaining(user.userId);
+   const { totalDue, totalPaid, remaining, tankCount, installmentTanks, cashTanks, unpaidCashTanks,
+        cashTotalDue, cashPaid, cashRemaining, cashTanksPaid,
+        instTotalDue, installmentsPaid, instRemaining, instTanksPaid } = calcRemaining(user.userId);
     const uInst = state.installments.filter(i => i.userId === user.userId);
     const uTanks = state.oilTanks.filter(t => t.userId === user.userId);
     const uCheese = state.cheese.filter(c => c.userId === user.userId);
