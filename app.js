@@ -242,22 +242,51 @@ function deleteTransaction(sheetName, transactionId, stateKey) {
 // ====================================================
 function calcRemaining(userId) {
   const userTanksList = state.oilTanks.filter(t => t.userId === userId);
-  const totalDue = userTanksList.reduce((s, t) =>
+
+  // ===== حسابات الكاش (منعزلة) =====
+  const cashTanksList = userTanksList.filter(t => t.tankType === 'cash');
+  const cashTanks = cashTanksList.reduce((s, t) => s + (parseInt(t.tanksCount) || 0), 0);
+  const cashTotalDue = cashTanksList.reduce((s, t) =>
+    s + ((parseInt(t.tanksCount) || 0) * (parseFloat(t.tankPrice) || 0)), 0);
+  const cashPaid = state.installments
+    .filter(i => i.userId === userId && i.payType === 'cash_payment')
+    .reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
+  const cashTanksPaid = cashTotalDue > 0
+    ? Math.floor(cashPaid / (cashTotalDue / cashTanks))
+    : 0;
+  const cashRemaining = cashTotalDue - cashPaid;
+
+  // ===== حسابات الأقساط (منعزلة) =====
+  const instTanksList = userTanksList.filter(t => t.tankType === 'installment');
+  const installmentTanks = instTanksList.reduce((s, t) => s + (parseInt(t.tanksCount) || 0), 0);
+  const instTotalDue = instTanksList.reduce((s, t) =>
     s + ((parseInt(t.tanksCount) || 0) * (parseFloat(t.tankPrice) || 0)), 0);
   const installmentsPaid = state.installments
     .filter(i => i.userId === userId && i.payType === 'installment')
     .reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
-  const cashPaid = state.installments
-    .filter(i => i.userId === userId && i.payType === 'cash_payment')
-    .reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
-  const totalPaid = installmentsPaid + cashPaid;
-  const tankCount = userTanksList.reduce((s, t) => s + (parseInt(t.tanksCount) || 0), 0);
-  const installmentTanks = userTanksList.filter(t => t.tankType === 'installment').reduce((s, t) => s + (parseInt(t.tanksCount) || 0), 0);
-  const cashTanks = userTanksList.filter(t => t.tankType === 'cash').reduce((s, t) => s + (parseInt(t.tanksCount) || 0), 0);
-  const unpaidCashTanks = userTanksList.filter(t => t.tankType === 'cash' && t.cashPaid !== 'yes').length;
-  return { totalDue, totalPaid, installmentsPaid, cashPaid, remaining: totalDue - totalPaid, tankCount, installmentTanks, cashTanks, unpaidCashTanks };
-}
+  const instTanksPaid = instTotalDue > 0
+    ? Math.floor(installmentsPaid / (instTotalDue / installmentTanks))
+    : 0;
+  const instRemaining = instTotalDue - installmentsPaid;
 
+  // ===== إجماليات =====
+  const tankCount = cashTanks + installmentTanks;
+  const unpaidCashTanks = cashTanksList.filter(t => t.cashPaid !== 'yes').length;
+
+  return {
+    // كاش
+    cashTanks, cashTotalDue, cashPaid, cashTanksPaid,
+    cashRemaining, cashTanksRemaining: cashTanks - cashTanksPaid,
+    // أقساط
+    installmentTanks, instTotalDue, installmentsPaid, instTanksPaid,
+    instRemaining, instTanksRemaining: installmentTanks - instTanksPaid,
+    // إجماليات
+    tankCount, unpaidCashTanks,
+    totalDue: cashTotalDue + instTotalDue,
+    totalPaid: cashPaid + installmentsPaid,
+    remaining: cashRemaining + instRemaining
+  };
+}
 // ====================================================
 // Installments
 // ====================================================
