@@ -930,3 +930,60 @@ document.addEventListener('DOMContentLoaded', () => {
   if(state.apiUrl&&state.apiKey) loadAllData();
   else toast('يرجى ضبط إعدادات الاتصال من تبويبة الإعدادات','warning');
 });
+
+
+function exportBackup() {
+  const backup = {
+    exportDate: nowISO(),
+    users:          state.users,
+    tankRecords:    state.tankRecords,
+    installments:   state.installments,
+    cashPayments:   state.cashPayments,
+    purchases:      state.purchases,
+    cheese:         state.cheese,
+    otherTransfers: state.otherTransfers,
+    bankMessages:   state.bankMessages,
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('تم تصدير النسخة الاحتياطية ✓', 'success');
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.users) { toast('ملف غير صالح', 'error'); return; }
+      showModal('📥 تأكيد الاستيراد',
+        '<p>سيتم عرض البيانات من الملف محلياً فقط — لن تُحفظ في Google Sheets تلقائياً.</p>',
+        () => {
+          state.users          = parsed.users          || [];
+          state.tankRecords    = parsed.tankRecords    || [];
+          state.installments   = parsed.installments   || [];
+          state.cashPayments   = parsed.cashPayments   || [];
+          state.purchases      = parsed.purchases      || [];
+          state.cheese         = parsed.cheese         || [];
+          state.otherTransfers = parsed.otherTransfers || [];
+          state.bankMessages   = parsed.bankMessages   || [];
+          refreshUsersDL();
+          refreshBatchDropdown();
+          renderAll();
+          toast('تم استيراد البيانات ✓', 'success');
+        }, '📥 استيراد');
+    } catch(err) {
+      toast('خطأ في قراءة الملف', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
