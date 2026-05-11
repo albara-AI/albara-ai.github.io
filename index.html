@@ -1,467 +1,1424 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>نظام إدارة الزيت والجبنة</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>نظام إدارة الزيت والجبنة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1419;--bg2:#1a2332;--card:#232f42;--card2:#2a3a52;
+  --green:#00d9a3;--purple:#7c3aed;--gold:#fbbf24;--red:#ef4444;
+  --orange:#f59e0b;--blue:#3b82f6;--text:#f1f5f9;--text2:#94a3b8;
+  --text3:#64748b;--border:rgba(255,255,255,0.08);--borderG:rgba(0,217,163,0.4);
+  --r:10px;--r2:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--bg);background-image:radial-gradient(at 0% 0%,rgba(124,58,237,.12) 0,transparent 50%),radial-gradient(at 100% 100%,rgba(0,217,163,.08) 0,transparent 50%);background-attachment:fixed;color:var(--text);min-height:100vh;padding-bottom:50px}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(15,20,25,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:17px}
+.logo-icon{font-size:22px;filter:drop-shadow(0 0 8px rgba(0,217,163,.6))}
+.logo-text{background:linear-gradient(135deg,var(--green),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stock-pill{background:linear-gradient(135deg,rgba(0,217,163,.15),rgba(124,58,237,.15));border:1px solid var(--borderG);padding:7px 16px;border-radius:100px;display:flex;align-items:center;gap:8px;box-shadow:0 0 20px rgba(0,217,163,.25)}
+.stock-label{font-size:12px;color:var(--text2);font-weight:600}
+.stock-val{font-size:19px;font-weight:900;color:var(--green)}
+.tabs{display:flex;gap:6px;padding:14px 20px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:10px 18px;border-radius:var(--r);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{background:var(--card2);color:var(--text)}
+.tab-btn.active{background:linear-gradient(135deg,var(--green),#00b894);color:#0f1419;border-color:var(--green);box-shadow:0 0 20px rgba(0,217,163,.35)}
+.container{max-width:1400px;margin:0 auto;padding:0 20px}
+.tab-content{display:none;animation:fadeIn .3s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-header{margin:20px 0;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.section-header h2{font-size:24px;font-weight:900}
+.section-header p{color:var(--text2);font-size:13px;margin-top:3px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px;transition:border-color .2s}
+.card:hover{border-color:rgba(255,255,255,.12)}
+.card-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:12px;font-weight:600;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:var(--r);font-family:inherit;font-size:13px;transition:border-color .2s;width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(0,217,163,.12)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3)}
+.inline{display:flex;gap:8px;align-items:center}
+.inline input{flex:1}
+.btn{border:none;padding:10px 20px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--green),#00b894);color:#0f1419;box-shadow:0 0 16px rgba(0,217,163,.3)}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 28px rgba(0,217,163,.5)}
+.btn-secondary{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--card2);border-color:var(--green)}
+.btn-danger{background:linear-gradient(135deg,var(--red),#dc2626);color:#fff}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(239,68,68,.4)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#d97706);color:#0f1419}
+.btn-purple{background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff}
+.btn-icon{background:transparent;border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;font-size:13px}
+.btn-icon:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;filter:blur(30px);opacity:.4}
+.stat-green::before{background:var(--green)}
+.stat-gold::before{background:var(--gold)}
+.stat-purple::before{background:var(--purple)}
+.stat-red::before{background:var(--red)}
+.stat-label{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px}
+.stat-value{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
+.table-wrapper{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border)}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;min-width:550px}
+.data-table thead{background:var(--bg2)}
+.data-table th{padding:12px 10px;text-align:right;font-weight:700;color:var(--green);border-bottom:2px solid var(--borderG);font-size:12px}
+.data-table td{padding:10px;border-bottom:1px solid var(--border);color:var(--text)}
+.data-table tbody tr:hover{background:rgba(0,217,163,.04)}
+.data-table .empty{text-align:center;color:var(--text3);padding:28px;font-style:italic}
+.rem-pos{color:var(--orange);font-weight:700}
+.rem-zero{color:var(--green);font-weight:700}
+.rem-neg{color:var(--red);font-weight:700}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(0,217,163,.15);color:var(--green)}
+.badge-gold{background:rgba(251,191,36,.15);color:var(--gold)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-purple{background:rgba(124,58,237,.15);color:var(--purple)}
+.search-bar{display:flex;gap:10px}
+.search-bar input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:var(--r);font-family:inherit;font-size:14px}
+.notif-bar{background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(245,158,11,.2));border-bottom:1px solid var(--red);padding:10px 20px;display:none;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px}
+.notif-bar.show{display:flex}
+.notif-title{font-weight:700;color:var(--red);white-space:nowrap}
+.late-list{color:var(--text);font-weight:600}
+.match-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;padding:10px;background:var(--bg2);border-radius:var(--r);margin-bottom:7px;align-items:center;font-size:13px}
+.match-ok{border-right:4px solid var(--green)}
+.match-low{border-right:4px solid var(--orange)}
+.match-high{border-right:4px solid var(--red)}
+.match-status{font-weight:700;text-align:center;padding:4px 10px;border-radius:var(--r)}
+.ms-ok{background:rgba(0,217,163,.15);color:var(--green)}
+.ms-low{background:rgba(245,158,11,.15);color:var(--orange)}
+.ms-high{background:rgba(239,68,68,.15);color:var(--red)}
+.batch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.batch-card{background:var(--bg2);padding:12px;border-radius:var(--r);border-right:4px solid var(--green)}
+.batch-num{font-size:11px;color:var(--text2);font-weight:600}
+.batch-total{font-size:20px;font-weight:900;color:var(--green);margin-top:4px}
+.batch-detail{font-size:11px;color:var(--text2);margin-top:4px}
+.toast-wrap{position:fixed;bottom:20px;left:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--card);border:1px solid var(--border);border-right:4px solid var(--green);padding:12px 18px;border-radius:var(--r);box-shadow:0 16px 40px rgba(0,0,0,.4);max-width:380px;min-width:260px;pointer-events:auto;animation:slideUp .3s ease;font-weight:600;font-size:13px}
+.toast.error{border-right-color:var(--red)}
+.toast.warning{border-right-color:var(--orange)}
+.toast.info{border-right-color:var(--blue)}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:modalIn .25s ease}
+@keyframes modalIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal h3{font-size:18px;margin-bottom:14px}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.hint{font-size:12px;color:var(--text3);margin-bottom:10px}
+.summary-wrap{background:linear-gradient(135deg,rgba(0,217,163,.08),rgba(124,58,237,.08));border:1px solid var(--borderG);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.sum-item{background:var(--bg2);padding:12px;border-radius:var(--r)}
+.sum-label{font-size:11px;color:var(--text2);margin-bottom:3px}
+.sum-value{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
+.section-divider{border-top:2px solid var(--borderG);margin:14px 0 10px;padding-top:10px;font-size:12px;font-weight:700;color:var(--green)}
+.export-btns{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:768px){
+  .topbar{padding:10px 14px}
+  .container{padding:0 12px}
+  .section-header h2{font-size:20px}
+  .card{padding:14px}
+  .form-grid{grid-template-columns:1fr}
+  .tabs{padding:10px 14px;gap:5px}
+  .tab-btn{padding:9px 13px;font-size:12px}
+  .match-row{grid-template-columns:1fr 1fr;font-size:12px}
+  .data-table{font-size:12px}
+  .data-table th,.data-table td{padding:8px 7px}
+}
+@media(max-width:480px){.stat-value{font-size:22px}.toast{min-width:auto}}
+</style>
 </head>
 <body>
 
-  <header class="topbar">
-    <div class="logo">
-      <span class="logo-icon">🛢️</span>
-      <span class="logo-text">نظام الإدارة</span>
-    </div>
-    <div class="stats-pill">
-      <span class="stats-label">التنكات المتبقية في المخزن</span>
-      <span class="stats-value" id="totalTanksDisplay">0</span>
-    </div>
-    <div class="connection-status" id="connectionStatus">
-      <span class="dot"></span>
-      <span class="status-text">جاري الاتصال...</span>
-    </div>
-  </header>
-
-  <!-- إشعارات الزبائن المتأخرين -->
-  <div id="latePaymentsBar" class="late-bar" style="display:none">
-    <span class="late-bar-title">⚠️ زبائن لم يدفعوا قبل نهاية الشهر:</span>
-    <span id="latePaymentsList"></span>
+<header class="topbar">
+  <div class="logo">
+    <span class="logo-icon">🛢️</span>
+    <span class="logo-text">نظام الإدارة</span>
   </div>
+  <div class="stock-pill">
+    <span class="stock-label">المخزن المتبقي</span>
+    <span class="stock-val" id="stockDisplay">0</span>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-gold" onclick="exportBackup()">💾 تصدير JSON</button>
+    <label class="btn btn-secondary" style="cursor:pointer">📥 استيراد JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(event)"></label>
+  </div>
+</header>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-tab="installments"><span class="tab-icon">💰</span><span>الأقساط</span></button>
-    <button class="tab-btn" data-tab="tanks"><span class="tab-icon">🛢️</span><span>التنكات</span></button>
-    <button class="tab-btn" data-tab="purchases"><span class="tab-icon">🚚</span><span>شراء الزيت</span></button>
-    <button class="tab-btn" data-tab="cheese"><span class="tab-icon">🧀</span><span>الجبنة</span></button>
-    <button class="tab-btn" data-tab="cheeseDetails"><span class="tab-icon">📋</span><span>تفاصيل الجبنة</span></button>
-    <button class="tab-btn" data-tab="transfers"><span class="tab-icon">💸</span><span>تحويلات</span></button>
-    <button class="tab-btn" data-tab="search"><span class="tab-icon">🔍</span><span>البحث</span></button>
-    <button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span><span>الإعدادات</span></button>
-  </nav>
+<div class="notif-bar" id="notifBar">
+  <span class="notif-title">⚠️ عملاء لم يدفعوا:</span>
+  <span class="late-list" id="lateList"></span>
+</div>
 
-  <main class="container">
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="tanks">🛢️ التنكات</button>
+  <button class="tab-btn" data-tab="installments">📅 الأقساط</button>
+  <button class="tab-btn" data-tab="cash">💵 الكاش</button>
+  <button class="tab-btn" data-tab="purchases">🚚 شراء الزيت</button>
+  <button class="tab-btn" data-tab="cheese">🧀 الجبنة</button>
+  <button class="tab-btn" data-tab="transfers">💸 تحويلات</button>
+  <button class="tab-btn" data-tab="bank">🏦 رسائل البنك</button>
+  <button class="tab-btn" data-tab="search">🔍 بحث</button>
+  <button class="tab-btn" data-tab="settings">⚙️ إعدادات</button>
+</nav>
 
-    <!-- ========== الأقساط ========== -->
-    <section class="tab-content active" id="tab-installments">
-      <div class="section-header">
-        <h2>إدارة الأقساط (الزيت)</h2>
-        <p class="section-subtitle">إدخال دفعات الأقساط ومتابعة المتبقي لكل زبون</p>
-      </div>
-      <div class="card">
-        <h3 class="card-title">➕ إضافة قسط / دفع كاش</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>الاسم أو الرقم</label>
-            <input type="text" id="inst_name" list="usersList" placeholder="ابحث بالاسم أو ID">
-            <datalist id="usersList"></datalist>
-          </div>
-          <div class="form-group">
-            <label>نوع الدفع</label>
-            <select id="inst_type" onchange="toggleInstallmentType()">
-              <option value="installment">قسط شهري</option>
-              <option value="cash_payment">دفع تنك كاش</option>
-            </select>
-          </div>
-          <div class="form-group" id="inst_month_group">
-            <label>الشهر المدفوع عنه</label>
-            <input type="month" id="inst_month">
-          </div>
-          <div class="form-group" id="inst_tank_ref_group" style="display:none">
-            <label>رقم تسجيل التنك الكاش</label>
-            <select id="inst_tank_ref">
-              <option value="">اختر التنك...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>المبلغ المدفوع (د.أ)</label>
-            <input type="number" id="inst_amount" step="0.01" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label>طريقة الدفع</label>
-            <select id="inst_method">
-              <option value="manual">يدوي (نقدي)</option>
-              <option value="electronic">إلكتروني (كليك)</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <textarea id="inst_notes" rows="2" placeholder="اختياري..."></textarea>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="addInstallmentBtn">💾 حفظ</button>
-      </div>
-      <div class="card">
-        <h3 class="card-title">📋 سجل الأقساط والمدفوعات</h3>
-        <div class="table-wrapper">
-          <table class="data-table" id="installmentsTable">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>النوع</th>
-                <th>المبلغ</th>
-                <th>الشهر / مرجع التنك</th>
-                <th>المتبقي</th>
-                <th>طريقة الدفع</th>
-                <th>التاريخ</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+<main class="container">
 
-    <!-- ========== التنكات ========== -->
-    <section class="tab-content" id="tab-tanks">
-      <div class="section-header">
-        <h2>إدارة التنكات</h2>
-        <p class="section-subtitle">تسجيل التنكات لكل زبون مع التمييز بين الكاش والأقساط</p>
-      </div>
-
-      <!-- إحصائيات المخزن -->
-      <div class="stats-grid">
-        <div class="stat-card stat-total">
-          <div class="stat-label">إجمالي المُستلم من المورد</div>
-          <div class="stat-value" id="totalReceivedDisplay">0</div>
-        </div>
-        <div class="stat-card stat-installments">
-          <div class="stat-label">إجمالي المُباع (أقساط + كاش)</div>
-          <div class="stat-value" id="totalSoldDisplay">0</div>
-        </div>
-        <div class="stat-card stat-cash">
-          <div class="stat-label">المتبقي في المخزن</div>
-          <div class="stat-value" id="stockRemainingDisplay">0</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 class="card-title">➕ إضافة تسجيل تنك</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>الاسم أو الرقم</label>
-            <input type="text" id="tank_name" list="usersList" placeholder="ابحث بالاسم أو ID">
-          </div>
-          <div class="form-group">
-            <label>نوع التنك</label>
-            <select id="tank_type">
-              <option value="installment">أقساط</option>
-              <option value="cash">كاش</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>اختر الدفعة</label>
-            <select id="tank_batch">
-              <option value="">اختر دفعة من المورد...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>عدد التنكات</label>
-            <input type="number" id="tank_count" step="1" min="1" placeholder="0">
-          </div>
-          <div class="form-group">
-            <label>سعر التنك (د.أ)</label>
-            <input type="number" id="tank_price" step="0.01" placeholder="0.00">
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <input type="text" id="tank_notes" placeholder="اختياري">
-          </div>
-        </div>
-        <button class="btn btn-primary" id="addTankBtn">💾 حفظ التسجيل</button>
-      </div>
-
-      <div class="card">
-        <h3 class="card-title">📋 سجل التنكات</h3>
-        <div class="table-wrapper">
-          <table class="data-table" id="tanksTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>الاسم</th>
-                <th>النوع</th>
-                <th>الدفعة</th>
-                <th>العدد</th>
-                <th>السعر</th>
-                <th>حالة الدفع (كاش)</th>
-                <th>التاريخ</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 class="card-title">📊 ملخص الدفعات</h3>
-        <div id="batchesSummary" class="batches-summary"></div>
-      </div>
-    </section>
-
-    <!-- ========== شراء الزيت ========== -->
-    <section class="tab-content" id="tab-purchases">
-      <div class="section-header">
-        <h2>شراء الزيت من المورّد</h2>
-        <p class="section-subtitle">تسجيل الدفعات الواردة من المورد</p>
-      </div>
-      <div class="card">
-        <h3 class="card-title">➕ إضافة دفعة من المورد</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>اسم المورّد</label>
-            <input type="text" id="pur_supplier" placeholder="اسم الشخص">
-          </div>
-          <div class="form-group">
-            <label>رقم الدفعة</label>
-            <input type="number" id="pur_batch" min="1" placeholder="1">
-          </div>
-          <div class="form-group">
-            <label>عدد التنكات</label>
-            <input type="number" id="pur_count" step="1" placeholder="0">
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <input type="text" id="pur_notes" placeholder="اختياري">
-          </div>
-        </div>
-        <button class="btn btn-primary" id="addPurchaseBtn">💾 حفظ</button>
-      </div>
-      <div class="card">
-        <h3 class="card-title">📋 سجل المشتريات</h3>
-        <div class="table-wrapper">
-          <table class="data-table" id="purchasesTable">
-            <thead>
-              <tr>
-                <th>رقم الدفعة</th>
-                <th>اسم المورد</th>
-                <th>عدد التنكات</th>
-                <th>التاريخ</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card">
-        <h3 class="card-title">⚖️ تقرير المطابقة</h3>
-        <div id="matchingReport"></div>
-      </div>
-    </section>
-
-    <!-- ========== الجبنة ========== -->
-    <section class="tab-content" id="tab-cheese">
-      <div class="section-header">
-        <h2>إدارة الجبنة</h2>
-        <p class="section-subtitle">تسجيل عمليات بيع الجبنة</p>
-      </div>
-      <div class="card">
-        <h3 class="card-title">➕ إضافة عملية جبنة</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>الاسم أو الرقم</label>
-            <input type="text" id="ch_name" list="usersList" placeholder="ابحث بالاسم أو ID">
-          </div>
-          <div class="form-group">
-            <label>رقم الدفعة</label>
-            <input type="text" id="ch_batch" placeholder="مثال: C-001">
-          </div>
-          <div class="form-group">
-            <label>المدفوع (د.أ)</label>
-            <input type="number" id="ch_paid" step="0.01" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label>الإجمالي (د.أ)</label>
-            <input type="number" id="ch_total" step="0.01" placeholder="0.00">
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <input type="text" id="ch_notes" placeholder="اختياري">
-          </div>
-        </div>
-        <button class="btn btn-primary" id="addCheeseBtn">💾 حفظ</button>
-      </div>
-      <div class="card">
-        <h3 class="card-title">📋 سجل الجبنة</h3>
-        <div class="table-wrapper">
-          <table class="data-table" id="cheeseTable">
-            <thead>
-              <tr><th>الاسم</th><th>الدفعة</th><th>المدفوع</th><th>الإجمالي</th><th>المتبقي</th><th>التاريخ</th><th>إجراء</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== تفاصيل الجبنة ========== -->
-    <section class="tab-content" id="tab-cheeseDetails">
-      <div class="section-header">
-        <h2>تفاصيل الجبنة (الأنصاف)</h2>
-      </div>
-      <div class="card">
-        <h3 class="card-title">➕ إضافة تفصيل</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>الاسم أو الرقم</label>
-            <input type="text" id="chd_name" list="usersList" placeholder="ابحث بالاسم أو ID">
-          </div>
-          <div class="form-group">
-            <label>رقم الدفعة</label>
-            <input type="text" id="chd_batch" placeholder="نفس رقم دفعة الجبنة">
-          </div>
-          <div class="form-group">
-            <label>عدد الأنصاف</label>
-            <input type="number" id="chd_halves" step="1" placeholder="0">
-          </div>
-          <div class="form-group">
-            <label>مدفوع؟</label>
-            <select id="chd_paid"><option value="no">لا</option><option value="yes">نعم</option></select>
-          </div>
-          <div class="form-group">
-            <label>طريقة الدفع</label>
-            <select id="chd_method"><option value="manual">يدوي</option><option value="electronic">إلكتروني</option></select>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="addCheeseDetailBtn">💾 حفظ</button>
-      </div>
-      <div class="card">
-        <h3 class="card-title">📋 سجل التفاصيل</h3>
-        <div class="table-wrapper">
-          <table class="data-table" id="cheeseDetailsTable">
-            <thead>
-              <tr><th>الاسم</th><th>الدفعة</th><th>الأنصاف</th><th>مدفوع؟</th><th>طريقة الدفع</th><th>التاريخ</th><th>إجراء</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== التحويلات المالية ========== -->
-    <section class="tab-content" id="tab-transfers">
-      <div class="section-header">
-        <h2>التحويلات المالية الأخرى</h2>
-        <p class="section-subtitle">تسجيل أي تحويلات أو معاملات مالية خارج نطاق الزيت والجبنة</p>
-      </div>
-      <div class="card">
-        <h3 class="card-title">➕ إضافة تحويل</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>الوصف</label>
-            <input type="text" id="tr_desc" placeholder="وصف التحويل">
-          </div>
-          <div class="form-group">
-            <label>المبلغ (د.أ)</label>
-            <input type="number" id="tr_amount" step="0.01" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label>النوع</label>
-            <select id="tr_type">
-              <option value="in">وارد (استلام)</option>
-              <option value="out">صادر (دفع)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>طريقة الدفع</label>
-            <select id="tr_method">
-              <option value="manual">يدوي (نقدي)</option>
-              <option value="electronic">إلكتروني</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <textarea id="tr_notes" rows="2" placeholder="أي تفاصيل إضافية..."></textarea>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="addTransferBtn">💾 حفظ</button>
-      </div>
-      <div class="card">
-        <h3 class="card-title">📋 سجل التحويلات</h3>
-        <div class="table-wrapper">
-          <table class="data-table" id="transfersTable">
-            <thead>
-              <tr><th>رقم العملية</th><th>الوصف</th><th>المبلغ</th><th>النوع</th><th>طريقة الدفع</th><th>الملاحظات</th><th>التاريخ</th><th>إجراء</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== البحث ========== -->
-    <section class="tab-content" id="tab-search">
-      <div class="section-header">
-        <h2>البحث والتقارير</h2>
-      </div>
-      <div class="card">
-        <h3 class="card-title">🔍 بحث</h3>
-        <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="ابحث بالاسم أو ID...">
-          <button class="btn btn-primary" id="searchBtn">بحث</button>
-        </div>
-      </div>
-      <div id="searchResults"></div>
-    </section>
-
-    <!-- ========== الإعدادات ========== -->
-    <section class="tab-content" id="tab-settings">
-      <div class="section-header">
-        <h2>الإعدادات</h2>
-      </div>
-      <div class="card">
-        <h3 class="card-title">🔐 كلمة سر الحذف</h3>
+  <!-- ===== TANKS ===== -->
+  <section class="tab-content active" id="tab-tanks">
+    <div class="section-header"><h2>إدارة التنكات</h2><p>تسجيل توزيع التنكات على الزبائن</p></div>
+    <div class="stats-grid">
+      <div class="stat-card stat-green"><div class="stat-label">إجمالي المُستلم</div><div class="stat-value" style="color:var(--green)" id="st_received">0</div></div>
+      <div class="stat-card stat-gold"><div class="stat-label">إجمالي المُوزَّع</div><div class="stat-value" style="color:var(--gold)" id="st_distributed">0</div></div>
+      <div class="stat-card stat-purple"><div class="stat-label">المتبقي في المخزن</div><div class="stat-value" style="color:var(--purple)" id="st_stock">0</div></div>
+    </div>
+    <div class="card">
+      <h3 class="card-title">➕ تسجيل تنكات لزبون</h3>
+      <div class="form-grid">
         <div class="form-group">
-          <div class="inline-controls">
-            <input type="password" id="deletePasswordInput" placeholder="••••••">
-            <button class="btn btn-secondary" id="saveDeletePasswordBtn">💾 حفظ</button>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <h3 class="card-title">📤 تصدير البيانات</h3>
-        <div class="export-buttons">
-          <button class="btn btn-export" onclick="exportToCSV('installments')">⬇️ الأقساط</button>
-          <button class="btn btn-export" onclick="exportToCSV('oilTanks')">⬇️ التنكات</button>
-          <button class="btn btn-export" onclick="exportToCSV('oilPurchases')">⬇️ المشتريات</button>
-          <button class="btn btn-export" onclick="exportToCSV('cheese')">⬇️ الجبنة</button>
-          <button class="btn btn-export" onclick="exportToCSV('transfers')">⬇️ التحويلات</button>
-        </div>
-      </div>
-      <div class="card">
-        <h3 class="card-title">🔗 إعدادات الاتصال</h3>
-        <div class="form-group">
-          <label>رابط Web App URL</label>
-          <input type="text" id="apiUrlInput" placeholder="https://script.google.com/...">
+          <label>الاسم أو ID</label>
+          <input type="text" id="tk_nameId" list="usersDL" placeholder="اسم أو ID الزبون" oninput="fillUserPrices('tk')">
+          <datalist id="usersDL"></datalist>
         </div>
         <div class="form-group">
-          <label>مفتاح الحماية (API Key)</label>
-          <input type="text" id="apiKeyInput" placeholder="API Key">
+          <label>اختر الدفعة</label>
+          <select id="tk_batch"><option value="">-- اختر دفعة --</option></select>
         </div>
-        <button class="btn btn-secondary" id="saveApiSettingsBtn">💾 حفظ الإعدادات</button>
+        <div class="form-group">
+          <label>تنكات الكاش</label>
+          <input type="number" id="tk_cash" min="0" placeholder="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>سعر تنك الكاش (د.أ)</label>
+          <input type="number" id="tk_cashPrice" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>تنكات الأقساط</label>
+          <input type="number" id="tk_inst" min="0" placeholder="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>سعر تنك الأقساط (د.أ)</label>
+          <input type="number" id="tk_instPrice" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group full">
+          <label>ملاحظات</label>
+          <input type="text" id="tk_notes" placeholder="اختياري">
+        </div>
       </div>
-    </section>
-
-  </main>
-
-  <div class="toast-container" id="toastContainer"></div>
-
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <h3 id="modalTitle"></h3>
-      <div id="modalBody"></div>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" id="modalCancel">إلغاء</button>
-        <button class="btn btn-danger" id="modalConfirm">تأكيد</button>
+      <button class="btn btn-primary" onclick="addTankRecord()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل التنكات</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="tanksTable">
+          <thead><tr><th>ID</th><th>الاسم</th><th>الدفعة</th><th>كاش</th><th>سعر كاش</th><th>أقساط</th><th>سعر أقساط</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📊 ملخص الدفعات</h3>
+      <div class="batch-grid" id="batchSummary"></div>
+    </div>
+  </section>
+
+  <!-- ===== INSTALLMENTS ===== -->
+  <section class="tab-content" id="tab-installments">
+    <div class="section-header"><h2>الأقساط الشهرية</h2><p>تتبع دفعات الأقساط لكل زبون</p></div>
+    <div class="card">
+      <h3 class="card-title">➕ إضافة دفعة قسط</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الاسم أو ID</label>
+          <input type="text" id="inst_nameId" list="usersDL" placeholder="اسم أو ID الزبون">
+        </div>
+        <div class="form-group">
+          <label>المبلغ المدفوع (د.أ)</label>
+          <input type="number" id="inst_amount" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>الشهر المدفوع عنه</label>
+          <input type="month" id="inst_month">
+        </div>
+        <div class="form-group">
+          <label>طريقة الدفع</label>
+          <select id="inst_method"><option value="manual">💵 يدوي</option><option value="electronic">💳 إلكتروني</option></select>
+        </div>
+        <div class="form-group full">
+          <label>ملاحظات</label>
+          <textarea id="inst_notes" rows="2" placeholder="اختياري"></textarea>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addInstallment()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل الأقساط</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="instTable">
+          <thead><tr><th>TX ID</th><th>الاسم</th><th>المبلغ</th><th>الشهر</th><th>تنكات مدفوعة</th><th>المتبقي (تنك)</th><th>طريقة</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CASH ===== -->
+  <section class="tab-content" id="tab-cash">
+    <div class="section-header"><h2>دفعات الكاش</h2><p>تتبع مدفوعات تنكات الكاش لكل زبون</p></div>
+    <div class="card">
+      <h3 class="card-title">➕ إضافة دفعة كاش</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الاسم أو ID</label>
+          <input type="text" id="cash_nameId" list="usersDL" placeholder="اسم أو ID الزبون">
+        </div>
+        <div class="form-group">
+          <label>المبلغ المدفوع (د.أ)</label>
+          <input type="number" id="cash_amount" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>طريقة الدفع</label>
+          <select id="cash_method"><option value="manual">💵 يدوي</option><option value="electronic">💳 إلكتروني</option></select>
+        </div>
+        <div class="form-group full">
+          <label>ملاحظات</label>
+          <textarea id="cash_notes" rows="2" placeholder="اختياري"></textarea>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addCashPayment()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل مدفوعات الكاش</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="cashTable">
+          <thead><tr><th>TX ID</th><th>الاسم</th><th>المبلغ</th><th>تنكات مدفوعة</th><th>المتبقي (تنك)</th><th>طريقة</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PURCHASES ===== -->
+  <section class="tab-content" id="tab-purchases">
+    <div class="section-header"><h2>شراء الزيت من المورد</h2><p>تسجيل الدفعات الواردة</p></div>
+    <div class="card">
+      <h3 class="card-title">➕ إضافة دفعة واردة</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>اسم المورد</label>
+          <input type="text" id="pur_supplier" placeholder="اسم المورد">
+        </div>
+        <div class="form-group">
+          <label>رقم الدفعة</label>
+          <input type="number" id="pur_batch" min="1" placeholder="1">
+        </div>
+        <div class="form-group">
+          <label>عدد التنكات</label>
+          <input type="number" id="pur_count" min="1" placeholder="0">
+        </div>
+        <div class="form-group full">
+          <label>ملاحظات</label>
+          <input type="text" id="pur_notes" placeholder="اختياري">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addPurchase()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل المشتريات</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="purTable">
+          <thead><tr><th>الدفعة</th><th>المورد</th><th>العدد</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="card-title">⚖️ تقرير المطابقة</h3>
+      <div id="matchReport"></div>
+    </div>
+  </section>
+
+  <!-- ===== CHEESE ===== -->
+  <section class="tab-content" id="tab-cheese">
+    <div class="section-header"><h2>إدارة الجبنة</h2></div>
+    <div class="card">
+      <h3 class="card-title">➕ إضافة</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>الاسم أو ID</label><input type="text" id="ch_nameId" list="usersDL" placeholder="اسم أو ID الزبون"></div>
+        <div class="form-group"><label>رقم الدفعة</label><input type="text" id="ch_batch" placeholder="C-001"></div>
+        <div class="form-group"><label>المدفوع (د.أ)</label><input type="number" id="ch_paid" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>الإجمالي (د.أ)</label><input type="number" id="ch_total" step="0.01" placeholder="0.00"></div>
+        <div class="form-group full"><label>ملاحظات</label><input type="text" id="ch_notes" placeholder="اختياري"></div>
+      </div>
+      <button class="btn btn-primary" onclick="addCheese()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل الجبنة</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="cheeseTable">
+          <thead><tr><th>TX ID</th><th>الاسم</th><th>الدفعة</th><th>المدفوع</th><th>الإجمالي</th><th>المتبقي</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRANSFERS ===== -->
+  <section class="tab-content" id="tab-transfers">
+    <div class="section-header"><h2>التحويلات المالية الأخرى</h2><p>سجل مستقل لأي معاملة مالية أخرى</p></div>
+    <div class="card">
+      <h3 class="card-title">➕ إضافة تحويل</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>الوصف</label><input type="text" id="tr_desc" placeholder="وصف العملية"></div>
+        <div class="form-group"><label>المبلغ (د.أ)</label><input type="number" id="tr_amount" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>النوع</label><select id="tr_type"><option value="in">📥 وارد</option><option value="out">📤 صادر</option></select></div>
+        <div class="form-group"><label>طريقة الدفع</label><select id="tr_method"><option value="manual">💵 يدوي</option><option value="electronic">💳 إلكتروني</option></select></div>
+        <div class="form-group full"><label>ملاحظات</label><textarea id="tr_notes" rows="2" placeholder="اختياري"></textarea></div>
+      </div>
+      <button class="btn btn-primary" onclick="addTransfer()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل التحويلات</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="transfersTable">
+          <thead><tr><th>TX ID</th><th>الوصف</th><th>المبلغ</th><th>النوع</th><th>طريقة</th><th>ملاحظات</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BANK ===== -->
+  <section class="tab-content" id="tab-bank">
+    <div class="section-header"><h2>سجل رسائل البنك</h2><p>أدخل نص الرسائل البنكية يدوياً للأرشفة</p></div>
+    <!-- SMS API HOOK: يمكن ربط API هنا مستقبلاً لاستقبال الرسائل تلقائياً -->
+    <div class="card">
+      <h3 class="card-title">➕ إضافة رسالة</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>المبلغ (د.أ)</label><input type="number" id="bank_amount" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>نوع العملية</label><select id="bank_type"><option value="in">دخول</option><option value="out">خروج</option></select></div>
+        <div class="form-group full"><label>نص الرسالة</label><textarea id="bank_msg" rows="3" placeholder="الصق نص الرسالة هنا..."></textarea></div>
+      </div>
+      <button class="btn btn-primary" onclick="addBankMsg()">💾 حفظ</button>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📋 سجل الرسائل</h3>
+      <div class="table-wrapper">
+        <table class="data-table" id="bankTable">
+          <thead><tr><th>المبلغ</th><th>النوع</th><th>نص الرسالة</th><th>التاريخ</th><th>حذف</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SEARCH ===== -->
+  <section class="tab-content" id="tab-search">
+    <div class="section-header"><h2>البحث والتقارير</h2></div>
+    <div class="card">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="ابحث بالاسم أو ID...">
+        <button class="btn btn-primary" onclick="doSearch()">🔍 بحث</button>
+      </div>
+    </div>
+    <div id="searchResults"></div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section class="tab-content" id="tab-settings">
+    <div class="section-header"><h2>الإعدادات</h2></div>
+    <div class="card">
+      <h3 class="card-title">🔐 كلمة سر الحذف</h3>
+      <div class="inline">
+        <input type="password" id="delPassInput" placeholder="كلمة السر الحالية أو الجديدة" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:var(--r);font-family:inherit;font-size:13px;flex:1">
+        <button class="btn btn-secondary" onclick="saveDelPass()">💾 حفظ</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="card-title">📤 تصدير واستيراد البيانات</h3>
+      <p class="hint">استخدم هذه الأزرار لنقل البيانات بين الأجهزة يدوياً</p>
+      <div class="export-btns">
+        <button class="btn btn-gold" onclick="exportBackup()">💾 تصدير JSON</button>
+        <label class="btn btn-secondary" style="cursor:pointer">📥 استيراد JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(event)"></label>
+        <button class="btn btn-purple" onclick="exportCSV()">📊 تصدير CSV</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-danger" id="modalConfirm">تأكيد</button>
     </div>
   </div>
+</div>
 
-  <script src="app.js"></script>
+<script>
+// ====================================================
+// DATA STRUCTURE
+// ====================================================
+const STORAGE_KEY = 'oilCheeseAppData';
+
+const DEFAULT_DATA = {
+  users: [],
+  transactions: { cash: [], installments: [] },
+  tankRecords: [],
+  inventory: { supplierBatches: [] },
+  cheese: [],
+  otherTransfers: [],
+  bankMessages: [],
+  notifications: [],
+  settings: { deletePassword: '1234', opCounter: 0 }
+};
+
+let appData = null;
+
+// ====================================================
+// LOAD / SAVE
+// ====================================================
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // merge to ensure new keys exist
+      appData = {
+        users: parsed.users || [],
+        transactions: {
+          cash: (parsed.transactions && parsed.transactions.cash) || [],
+          installments: (parsed.transactions && parsed.transactions.installments) || []
+        },
+        tankRecords: parsed.tankRecords || [],
+        inventory: { supplierBatches: (parsed.inventory && parsed.inventory.supplierBatches) || [] },
+        cheese: parsed.cheese || [],
+        otherTransfers: parsed.otherTransfers || [],
+        bankMessages: parsed.bankMessages || [],
+        notifications: parsed.notifications || [],
+        settings: Object.assign({ deletePassword: '1234', opCounter: 0 }, parsed.settings || {})
+      };
+    } else {
+      appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+  } catch(e) {
+    appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+// ====================================================
+// ID GENERATORS
+// ====================================================
+function randChars() {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  return c[Math.floor(Math.random()*c.length)] + c[Math.floor(Math.random()*c.length)];
+}
+function genUserId() {
+  const nums = String(1000 + appData.users.length + Math.floor(Math.random()*9));
+  return nums + randChars();
+}
+function genTxId(prefix) {
+  const nums = String(1000 + Math.floor(Math.random()*9000));
+  return (prefix || 'TX') + '-' + nums + randChars();
+}
+function nowISO() { return new Date().toISOString(); }
+function fmtDate(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleString('ar-EG', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+function fmtMoney(n) {
+  if (isNaN(n) || n == null) return '0';
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits:0, maximumFractionDigits:2 });
+}
+function esc(t) {
+  if (t == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(t);
+  return d.innerHTML;
+}
+
+// ====================================================
+// TOAST
+// ====================================================
+function toast(msg, type) {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' '+type : '');
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(16px)'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+// ====================================================
+// MODAL
+// ====================================================
+function showModal(title, body, onConfirm, confirmLabel) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalConfirm').textContent = confirmLabel || 'تأكيد';
+  document.getElementById('modalOverlay').classList.add('active');
+  const btn = document.getElementById('modalConfirm').cloneNode(true);
+  document.getElementById('modalConfirm').replaceWith(btn);
+  btn.addEventListener('click', () => { onConfirm(); closeModal(); });
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+// ====================================================
+// USERS
+// ====================================================
+function getOrCreateUser(nameOrId) {
+  const q = String(nameOrId).trim();
+  if (!q) return null;
+  let u = appData.users.find(x => x.id === q || x.name === q);
+  if (!u) {
+    u = { id: genUserId(), name: q, cashPrice: 0, installmentPrice: 0, createdAt: nowISO() };
+    appData.users.push(u);
+    saveData();
+    refreshUsersDL();
+  }
+  return u;
+}
+function findUser(nameOrId) {
+  const q = String(nameOrId || '').trim();
+  return appData.users.find(x => x.id === q || x.name === q) || null;
+}
+function refreshUsersDL() {
+  const dl = document.getElementById('usersDL');
+  dl.innerHTML = appData.users.map(u => `<option value="${esc(u.name)}">[${esc(u.id)}]</option>`).join('');
+}
+function fillUserPrices(prefix) {
+  const u = findUser(document.getElementById(prefix+'_nameId').value);
+  if (!u) return;
+  const cp = document.getElementById(prefix+'_cashPrice');
+  const ip = document.getElementById(prefix+'_instPrice');
+  if (cp && !cp.value) cp.value = u.cashPrice || '';
+  if (ip && !ip.value) ip.value = u.installmentPrice || '';
+}
+
+// ====================================================
+// INVENTORY
+// ====================================================
+function getTotalPurchased() {
+  return appData.inventory.supplierBatches.reduce((s,b) => s+(parseInt(b.count)||0), 0);
+}
+function getTotalDistributed() {
+  return appData.tankRecords.reduce((s,r) => s+(parseInt(r.cash)||0)+(parseInt(r.inst)||0), 0);
+}
+function getStock() { return getTotalPurchased() - getTotalDistributed(); }
+function refreshBatchDropdown() {
+  const sel = document.getElementById('tk_batch');
+  const batches = appData.inventory.supplierBatches.sort((a,b)=>(parseInt(a.num)||0)-(parseInt(b.num)||0));
+  sel.innerHTML = '<option value="">-- اختر دفعة --</option>' +
+    batches.map(b => `<option value="${esc(b.num)}">دفعة ${esc(b.num)} (${b.count} تنك)</option>`).join('');
+}
+
+// ====================================================
+// CALC CASH (مستقل)
+// ====================================================
+function calcCash(userId) {
+  const userTanks = appData.tankRecords.filter(r => r.userId === userId);
+  const totalCashTanks = userTanks.reduce((s,r) => s+(parseInt(r.cash)||0), 0);
+  const cashPrice = userTanks.length > 0 ? (parseFloat(userTanks[userTanks.length-1].cashPrice)||0) : 0;
+  const totalCashDue = totalCashTanks * cashPrice;
+  const totalCashPaid = appData.transactions.cash
+    .filter(t => t.userId === userId)
+    .reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+  const cashTanksPaid = cashPrice > 0 ? Math.floor(totalCashPaid / cashPrice) : 0;
+  const cashTanksRemaining = totalCashTanks - cashTanksPaid;
+  const cashMoneyRemaining = totalCashDue - totalCashPaid;
+  return { totalCashTanks, cashPrice, totalCashDue, totalCashPaid, cashTanksPaid, cashTanksRemaining, cashMoneyRemaining };
+}
+
+// ====================================================
+// CALC INSTALLMENTS (مستقل)
+// ====================================================
+function calcInstallments(userId) {
+  const userTanks = appData.tankRecords.filter(r => r.userId === userId);
+  const totalInstTanks = userTanks.reduce((s,r) => s+(parseInt(r.inst)||0), 0);
+  const instPrice = userTanks.length > 0 ? (parseFloat(userTanks[userTanks.length-1].instPrice)||0) : 0;
+  const totalInstDue = totalInstTanks * instPrice;
+  const totalInstPaid = appData.transactions.installments
+    .filter(t => t.userId === userId)
+    .reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+  const instTanksPaid = instPrice > 0 ? Math.floor(totalInstPaid / instPrice) : 0;
+  const instTanksRemaining = totalInstTanks - instTanksPaid;
+  const instMoneyRemaining = totalInstDue - totalInstPaid;
+  return { totalInstTanks, instPrice, totalInstDue, totalInstPaid, instTanksPaid, instTanksRemaining, instMoneyRemaining };
+}
+
+// ====================================================
+// ADD TANK RECORD
+// ====================================================
+function addTankRecord() {
+  const nameOrId = document.getElementById('tk_nameId').value.trim();
+  const batch = document.getElementById('tk_batch').value;
+  const cashCount = parseInt(document.getElementById('tk_cash').value) || 0;
+  const cashPrice = parseFloat(document.getElementById('tk_cashPrice').value) || 0;
+  const instCount = parseInt(document.getElementById('tk_inst').value) || 0;
+  const instPrice = parseFloat(document.getElementById('tk_instPrice').value) || 0;
+  const notes = document.getElementById('tk_notes').value.trim();
+
+  if (!nameOrId) { toast('أدخل الاسم أو ID', 'error'); return; }
+  if (!batch) { toast('اختر الدفعة', 'error'); return; }
+  if (cashCount + instCount <= 0) { toast('أدخل عدد تنكات صحيح', 'error'); return; }
+  if (cashCount > 0 && cashPrice <= 0) { toast('أدخل سعر تنك الكاش', 'error'); return; }
+  if (instCount > 0 && instPrice <= 0) { toast('أدخل سعر تنك الأقساط', 'error'); return; }
+
+  const total = cashCount + instCount;
+  const stock = getStock();
+  if (total > stock) {
+    toast(`❌ المخزن يحتوي فقط ${stock} تنك — لا يمكن تسجيل ${total}`, 'error');
+    return;
+  }
+
+  const user = getOrCreateUser(nameOrId);
+  if (!user) return;
+
+  // حفظ السعر الأخير للمستخدم
+  if (cashPrice > 0) user.cashPrice = cashPrice;
+  if (instPrice > 0) user.installmentPrice = instPrice;
+
+  const rec = {
+    id: genTxId('TK'),
+    userId: user.id, userName: user.name,
+    batch, cash: cashCount, cashPrice,
+    inst: instCount, instPrice,
+    notes, createdAt: nowISO()
+  };
+
+  appData.tankRecords.push(rec);
+  incCounter();
+  saveData();
+
+  document.getElementById('tk_nameId').value = '';
+  document.getElementById('tk_cash').value = '0';
+  document.getElementById('tk_cashPrice').value = '';
+  document.getElementById('tk_inst').value = '0';
+  document.getElementById('tk_instPrice').value = '';
+  document.getElementById('tk_notes').value = '';
+
+  renderAll();
+  toast(`تم تسجيل ${total} تنك ✓`, 'success');
+}
+
+// ====================================================
+// ADD INSTALLMENT
+// ====================================================
+function addInstallment() {
+  const nameOrId = document.getElementById('inst_nameId').value.trim();
+  const amount = parseFloat(document.getElementById('inst_amount').value);
+  const month = document.getElementById('inst_month').value;
+  const method = document.getElementById('inst_method').value;
+  const notes = document.getElementById('inst_notes').value.trim();
+
+  if (!nameOrId) { toast('أدخل الاسم أو ID', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { toast('أدخل مبلغاً صحيحاً', 'error'); return; }
+  if (!month) { toast('اختر الشهر', 'error'); return; }
+
+  const user = getOrCreateUser(nameOrId);
+  if (!user) return;
+
+  const rec = {
+    id: genTxId('IN'), userId: user.id, userName: user.name,
+    amount, month, method, notes, createdAt: nowISO()
+  };
+
+  appData.transactions.installments.push(rec);
+  incCounter();
+  saveData();
+
+  document.getElementById('inst_nameId').value = '';
+  document.getElementById('inst_amount').value = '';
+  document.getElementById('inst_notes').value = '';
+
+  renderAll();
+  toast('تم حفظ القسط ✓', 'success');
+}
+
+// ====================================================
+// ADD CASH PAYMENT
+// ====================================================
+function addCashPayment() {
+  const nameOrId = document.getElementById('cash_nameId').value.trim();
+  const amount = parseFloat(document.getElementById('cash_amount').value);
+  const method = document.getElementById('cash_method').value;
+  const notes = document.getElementById('cash_notes').value.trim();
+
+  if (!nameOrId) { toast('أدخل الاسم أو ID', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { toast('أدخل مبلغاً صحيحاً', 'error'); return; }
+
+  const user = getOrCreateUser(nameOrId);
+  if (!user) return;
+
+  const rec = {
+    id: genTxId('CA'), userId: user.id, userName: user.name,
+    amount, method, notes, createdAt: nowISO()
+  };
+
+  appData.transactions.cash.push(rec);
+  incCounter();
+  saveData();
+
+  document.getElementById('cash_nameId').value = '';
+  document.getElementById('cash_amount').value = '';
+  document.getElementById('cash_notes').value = '';
+
+  renderAll();
+  toast('تم حفظ دفعة الكاش ✓', 'success');
+}
+
+// ====================================================
+// ADD PURCHASE
+// ====================================================
+function addPurchase() {
+  const supplier = document.getElementById('pur_supplier').value.trim();
+  const batchNum = document.getElementById('pur_batch').value.trim();
+  const count = parseInt(document.getElementById('pur_count').value);
+  const notes = document.getElementById('pur_notes').value.trim();
+
+  if (!supplier) { toast('أدخل اسم المورد', 'error'); return; }
+  if (!batchNum || isNaN(parseInt(batchNum))) { toast('أدخل رقم دفعة صحيح', 'error'); return; }
+  if (isNaN(count) || count <= 0) { toast('أدخل عدداً صحيحاً', 'error'); return; }
+  if (appData.inventory.supplierBatches.find(b => String(b.num) === String(batchNum))) {
+    toast(`❌ دفعة ${batchNum} موجودة مسبقاً`, 'error'); return;
+  }
+
+  appData.inventory.supplierBatches.push({ num: batchNum, supplier, count, notes, createdAt: nowISO() });
+  incCounter();
+  saveData();
+
+  document.getElementById('pur_supplier').value = '';
+  document.getElementById('pur_batch').value = '';
+  document.getElementById('pur_count').value = '';
+  document.getElementById('pur_notes').value = '';
+
+  refreshBatchDropdown();
+  renderAll();
+  toast(`تم تسجيل دفعة ${batchNum} (${count} تنك) ✓`, 'success');
+}
+
+// ====================================================
+// ADD CHEESE
+// ====================================================
+function addCheese() {
+  const nameOrId = document.getElementById('ch_nameId').value.trim();
+  const batch = document.getElementById('ch_batch').value.trim();
+  const paid = parseFloat(document.getElementById('ch_paid').value);
+  const total = parseFloat(document.getElementById('ch_total').value);
+  const notes = document.getElementById('ch_notes').value.trim();
+
+  if (!nameOrId) { toast('أدخل الاسم أو ID', 'error'); return; }
+  if (!batch) { toast('أدخل رقم الدفعة', 'error'); return; }
+  if (isNaN(paid) || paid < 0) { toast('أدخل المدفوع', 'error'); return; }
+  if (isNaN(total) || total <= 0) { toast('أدخل الإجمالي', 'error'); return; }
+
+  const user = getOrCreateUser(nameOrId);
+  if (!user) return;
+
+  const rec = {
+    id: genTxId('CH'), userId: user.id, userName: user.name,
+    batch, paid, total, notes, createdAt: nowISO()
+  };
+
+  appData.cheese.push(rec);
+  incCounter();
+  saveData();
+
+  document.getElementById('ch_nameId').value = '';
+  document.getElementById('ch_paid').value = '';
+  document.getElementById('ch_total').value = '';
+  document.getElementById('ch_notes').value = '';
+
+  renderAll();
+  const rem = total - paid;
+  toast(`تم الحفظ. متبقي: ${fmtMoney(rem)} د.أ`, rem > total*0.5 ? 'warning' : 'success');
+}
+
+// ====================================================
+// ADD TRANSFER
+// ====================================================
+function addTransfer() {
+  const desc = document.getElementById('tr_desc').value.trim();
+  const amount = parseFloat(document.getElementById('tr_amount').value);
+  const type = document.getElementById('tr_type').value;
+  const method = document.getElementById('tr_method').value;
+  const notes = document.getElementById('tr_notes').value.trim();
+
+  if (!desc) { toast('أدخل الوصف', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { toast('أدخل مبلغاً صحيحاً', 'error'); return; }
+
+  appData.otherTransfers.push({ id: genTxId('TR'), desc, amount, type, method, notes, createdAt: nowISO() });
+  incCounter();
+  saveData();
+
+  document.getElementById('tr_desc').value = '';
+  document.getElementById('tr_amount').value = '';
+  document.getElementById('tr_notes').value = '';
+
+  renderTransfers();
+  toast('تم حفظ التحويل ✓', 'success');
+}
+
+// ====================================================
+// ADD BANK MSG
+// ====================================================
+function addBankMsg() {
+  const amount = parseFloat(document.getElementById('bank_amount').value);
+  const type = document.getElementById('bank_type').value;
+  const msg = document.getElementById('bank_msg').value.trim();
+
+  if (!msg) { toast('أدخل نص الرسالة', 'error'); return; }
+
+  appData.bankMessages.push({ id: genTxId('BK'), amount: isNaN(amount)?0:amount, type, msg, createdAt: nowISO() });
+  saveData();
+
+  document.getElementById('bank_amount').value = '';
+  document.getElementById('bank_msg').value = '';
+
+  renderBank();
+  toast('تم حفظ الرسالة ✓', 'success');
+}
+
+// ====================================================
+// DELETE
+// ====================================================
+function askDelete(collection, id, isNested) {
+  showModal('🗑️ تأكيد الحذف',
+    `<p style="margin-bottom:12px">أدخل كلمة سر الحذف:</p>
+     <input type="password" id="delPassConfirm" placeholder="كلمة السر"
+       style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);font-family:inherit;font-size:13px">`,
+    () => {
+      const pass = document.getElementById('delPassConfirm').value;
+      if (pass !== appData.settings.deletePassword) { toast('كلمة سر خاطئة', 'error'); return; }
+      if (isNested) {
+        appData.transactions[collection] = appData.transactions[collection].filter(x => x.id !== id);
+      } else if (collection === 'supplierBatches') {
+        appData.inventory.supplierBatches = appData.inventory.supplierBatches.filter(x => x.num !== id);
+      } else {
+        appData[collection] = appData[collection].filter(x => x.id !== id);
+      }
+      saveData();
+      renderAll();
+      toast('تم الحذف', 'success');
+    }, '🗑️ احذف');
+}
+
+// ====================================================
+// RENDER TANKS
+// ====================================================
+function renderTanks() {
+  const tbody = document.querySelector('#tanksTable tbody');
+  const recs = [...appData.tankRecords].sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+  if (!recs.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">لا توجد بيانات</td></tr>'; return; }
+  tbody.innerHTML = recs.map(r => `<tr>
+    <td><code style="font-size:11px">${esc(r.id)}</code></td>
+    <td><strong>${esc(r.userName)}</strong><br><small style="color:var(--text3)">${esc(r.userId)}</small></td>
+    <td>دفعة ${esc(r.batch)}</td>
+    <td style="color:var(--gold);font-weight:700">${r.cash}</td>
+    <td>${fmtMoney(r.cashPrice)} د.أ</td>
+    <td style="color:var(--purple);font-weight:700">${r.inst}</td>
+    <td>${fmtMoney(r.instPrice)} د.أ</td>
+    <td>${fmtDate(r.createdAt)}</td>
+    <td><button class="btn-icon" onclick="askDelete('tankRecords','${r.id}',false)">🗑️</button></td>
+  </tr>`).join('');
+
+  // batch summary
+  const bsMap = {};
+  appData.tankRecords.forEach(r => {
+    if (!bsMap[r.batch]) bsMap[r.batch] = { cash:0, inst:0 };
+    bsMap[r.batch].cash += parseInt(r.cash)||0;
+    bsMap[r.batch].inst += parseInt(r.inst)||0;
+  });
+  const bs = document.getElementById('batchSummary');
+  const entries = Object.entries(bsMap).sort((a,b)=>(parseInt(a[0])||0)-(parseInt(b[0])||0));
+  if (!entries.length) { bs.innerHTML = '<p style="color:var(--text3)">لا توجد دفعات</p>'; return; }
+  bs.innerHTML = entries.map(([b,v]) => `
+    <div class="batch-card">
+      <div class="batch-num">دفعة ${esc(b)}</div>
+      <div class="batch-total">${v.cash+v.inst} تنك</div>
+      <div class="batch-detail">💵 كاش: ${v.cash} | 📅 أقساط: ${v.inst}</div>
+    </div>`).join('');
+}
+
+// ====================================================
+// RENDER INSTALLMENTS
+// ====================================================
+function renderInstallments() {
+  const tbody = document.querySelector('#instTable tbody');
+  const recs = [...appData.transactions.installments].sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+  if (!recs.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">لا توجد بيانات</td></tr>'; return; }
+  tbody.innerHTML = recs.map(r => {
+    const ci = calcInstallments(r.userId);
+    const remClass = ci.instTanksRemaining > 0 ? 'rem-pos' : ci.instTanksRemaining === 0 ? 'rem-zero' : 'rem-neg';
+    const remText = ci.instTanksRemaining <= 0 ? 'مكتمل ✅' : `${ci.instTanksRemaining} تنك`;
+    return `<tr>
+      <td><code style="font-size:11px">${esc(r.id)}</code></td>
+      <td><strong>${esc(r.userName)}</strong></td>
+      <td>${fmtMoney(r.amount)} د.أ</td>
+      <td>${esc(r.month)}</td>
+      <td style="color:var(--purple)">${ci.instTanksPaid}</td>
+      <td class="${remClass}">${remText}</td>
+      <td>${r.method === 'electronic' ? '💳' : '💵'}</td>
+      <td>${fmtDate(r.createdAt)}</td>
+      <td><button class="btn-icon" onclick="askDelete('installments','${r.id}',true)">🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ====================================================
+// RENDER CASH
+// ====================================================
+function renderCash() {
+  const tbody = document.querySelector('#cashTable tbody');
+  const recs = [...appData.transactions.cash].sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+  if (!recs.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">لا توجد بيانات</td></tr>'; return; }
+  tbody.innerHTML = recs.map(r => {
+    const cc = calcCash(r.userId);
+    let remText, remClass;
+    if (cc.cashTanksRemaining <= 0) {
+      remText = 'مكتمل ✅'; remClass = 'rem-zero';
+    } else {
+      remText = `${cc.cashTanksRemaining} تنك (${fmtMoney(cc.cashMoneyRemaining)} د.أ)`;
+      remClass = 'rem-pos';
+    }
+    return `<tr>
+      <td><code style="font-size:11px">${esc(r.id)}</code></td>
+      <td><strong>${esc(r.userName)}</strong></td>
+      <td>${fmtMoney(r.amount)} د.أ</td>
+      <td style="color:var(--gold)">${cc.cashTanksPaid}</td>
+      <td class="${remClass}">${remText}</td>
+      <td>${r.method === 'electronic' ? '💳' : '💵'}</td>
+      <td>${fmtDate(r.createdAt)}</td>
+      <td><button class="btn-icon" onclick="askDelete('cash','${r.id}',true)">🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ====================================================
+// RENDER PURCHASES
+// ====================================================
+function renderPurchases() {
+  const tbody = document.querySelector('#purTable tbody');
+  const batches = [...appData.inventory.supplierBatches].sort((a,b)=>(parseInt(a.num)||0)-(parseInt(b.num)||0));
+  if (!batches.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">لا توجد بيانات</td></tr>'; return; }
+  tbody.innerHTML = batches.map(b => `<tr>
+    <td><strong>دفعة ${esc(b.num)}</strong></td>
+    <td>${esc(b.supplier)}</td>
+    <td style="color:var(--green);font-weight:700">${b.count}</td>
+    <td>${fmtDate(b.createdAt)}</td>
+    <td><button class="btn-icon" onclick="askDelete('supplierBatches','${b.num}',false)">🗑️</button></td>
+  </tr>`).join('');
+
+  // matching report
+  const mr = document.getElementById('matchReport');
+  const distByBatch = {};
+  appData.tankRecords.forEach(r => {
+    if (!distByBatch[r.batch]) distByBatch[r.batch] = { cash:0, inst:0 };
+    distByBatch[r.batch].cash += parseInt(r.cash)||0;
+    distByBatch[r.batch].inst += parseInt(r.inst)||0;
+  });
+
+  const allBatches = new Set([...batches.map(b=>b.num), ...Object.keys(distByBatch)]);
+  const totalP = batches.reduce((s,b)=>s+(parseInt(b.count)||0),0);
+  const totalD = getTotalDistributed();
+  const gDiff = totalP - totalD;
+
+  let html = `<div style="background:var(--bg2);padding:14px;border-radius:var(--r);margin-bottom:12px">
+    <div class="match-row ${gDiff===0?'match-ok':gDiff>0?'match-low':'match-high'}" style="border-radius:var(--r)">
+      <div><strong>الإجمالي</strong></div>
+      <div>مُشترى: <strong>${totalP}</strong></div>
+      <div>مُوزَّع: <strong>${totalD}</strong></div>
+      <div class="match-status ${gDiff===0?'ms-ok':gDiff>0?'ms-low':'ms-high'}">
+        ${gDiff===0?'✅ متطابق':gDiff>0?`⚠️ متبقي ${gDiff}`:`🔴 زيادة ${Math.abs(gDiff)}`}
+      </div>
+    </div>
+  </div>`;
+
+  Array.from(allBatches).sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0)).forEach(bNum => {
+    const pur = batches.find(b=>b.num===bNum);
+    const purchased = pur ? parseInt(pur.count)||0 : 0;
+    const dist = distByBatch[bNum] || {cash:0,inst:0};
+    const sold = dist.cash + dist.inst;
+    const diff = purchased - sold;
+    const cls = diff===0?'ok':diff>0?'low':'high';
+    html += `<div class="match-row match-${cls===('ok')?'ok':cls==='low'?'low':'high'}">
+      <div><strong>دفعة ${esc(bNum)}</strong></div>
+      <div>مُشترى: <strong>${purchased}</strong></div>
+      <div>كاش: ${dist.cash} | أقساط: ${dist.inst}</div>
+      <div class="match-status ms-${cls}">
+        ${diff===0?'✅ متطابق':diff>0?`⚠️ نقص ${diff}`:`🔴 زيادة ${Math.abs(diff)}`}
+      </div>
+    </div>`;
+  });
+  mr.innerHTML = html;
+}
+
+// ====================================================
+// RENDER CHEESE
+// ====================================================
+function renderCheese() {
+  const tbody = document.querySelector('#cheeseTable tbody');
+  const recs = [...appData.cheese].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if (!recs.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">لا توجد بيانات</td></tr>'; return; }
+  tbody.innerHTML = recs.map(r => {
+    const rem = (parseFloat(r.total)||0) - (parseFloat(r.paid)||0);
+    const alert = rem > (parseFloat(r.total)||0)*0.5;
+    return `<tr ${alert?'style="background:rgba(239,68,68,.07)"':''}>
+      <td><code style="font-size:11px">${esc(r.id)}</code></td>
+      <td><strong>${esc(r.userName)}</strong></td>
+      <td><code>${esc(r.batch)}</code></td>
+      <td>${fmtMoney(r.paid)} د.أ</td>
+      <td>${fmtMoney(r.total)} د.أ</td>
+      <td class="${rem>0?'rem-pos':rem===0?'rem-zero':'rem-neg'}">${fmtMoney(rem)} د.أ${alert?' ⚠️':''}</td>
+      <td>${fmtDate(r.createdAt)}</td>
+      <td><button class="btn-icon" onclick="askDelete('cheese','${r.id}',false)">🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ====================================================
+// RENDER TRANSFERS
+// ====================================================
+function renderTransfers() {
+  const tbody = document.querySelector('#transfersTable tbody');
+  const recs = [...appData.otherTransfers].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if (!recs.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">لا توجد بيانات</td></tr>'; return; }
+  tbody.innerHTML = recs.map(r => `<tr>
+    <td><code style="font-size:11px">${esc(r.id)}</code></td>
+    <td>${esc(r.desc)}</td>
+    <td style="color:${r.type==='in'?'var(--green)':'var(--red)'};font-weight:700">${fmtMoney(r.amount)} د.أ</td>
+    <td>${r.type==='in'?'📥 وارد':'📤 صادر'}</td>
+    <td>${r.method==='electronic'?'💳':'💵'}</td>
+    <td>${esc(r.notes)}</td>
+    <td>${fmtDate(r.createdAt)}</td>
+    <td><button class="btn-icon" onclick="askDelete('otherTransfers','${r.id}',false)">🗑️</button></td>
+  </tr>`).join('');
+}
+
+// ====================================================
+// RENDER BANK
+// ====================================================
+function renderBank() {
+  const tbody = document.querySelector('#bankTable tbody');
+  const recs = [...appData.bankMessages].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if (!recs.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">لا توجد رسائل</td></tr>'; return; }
+  tbody.innerHTML = recs.map(r => `<tr>
+    <td style="color:${r.type==='in'?'var(--green)':'var(--red)'};font-weight:700">${fmtMoney(r.amount)} د.أ</td>
+    <td>${r.type==='in'?'📥 دخول':'📤 خروج'}</td>
+    <td style="max-width:300px;word-break:break-word;font-size:12px">${esc(r.msg)}</td>
+    <td>${fmtDate(r.createdAt)}</td>
+    <td><button class="btn-icon" onclick="askDelete('bankMessages','${r.id}',false)">🗑️</button></td>
+  </tr>`).join('');
+}
+
+// ====================================================
+// RENDER STATS
+// ====================================================
+function renderStats() {
+  const received = getTotalPurchased();
+  const distributed = getTotalDistributed();
+  const stock = received - distributed;
+  document.getElementById('st_received').textContent = received;
+  document.getElementById('st_distributed').textContent = distributed;
+  document.getElementById('st_stock').textContent = stock;
+  document.getElementById('stockDisplay').textContent = stock;
+}
+
+// ====================================================
+// LATE PAYMENTS CHECK
+// ====================================================
+function checkLatePayments() {
+  const today = new Date();
+  const day = today.getDate();
+  const currentMonth = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+
+  // تنبيه في أيام محددة
+  if ([1,15,25].includes(day)) {
+    toast(`📅 تذكير: اليوم ${day} — راجع المدفوعات`, 'warning');
+  }
+
+  // عملاء لم يدفعوا هذا الشهر
+  if (day >= 25) {
+    const late = [];
+    appData.users.forEach(u => {
+      const hasInstTanks = appData.tankRecords.some(r => r.userId===u.id && parseInt(r.inst)>0);
+      if (!hasInstTanks) return;
+      const paidThisMonth = appData.transactions.installments.some(t =>
+        t.userId===u.id && t.month===currentMonth
+      );
+      if (!paidThisMonth) late.push(u.name);
+    });
+
+    const bar = document.getElementById('notifBar');
+    const list = document.getElementById('lateList');
+    if (late.length) {
+      bar.classList.add('show');
+      list.textContent = late.join(' • ');
+    } else {
+      bar.classList.remove('show');
+    }
+  }
+}
+
+// ====================================================
+// SEARCH
+// ====================================================
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const res = document.getElementById('searchResults');
+  if (!q) { res.innerHTML=''; return; }
+
+  const matched = appData.users.filter(u =>
+    u.name.toLowerCase().includes(q) || u.id.toLowerCase().includes(q)
+  );
+
+  if (!matched.length) {
+    res.innerHTML = '<p style="color:var(--text3);padding:20px;text-align:center">لم يُعثر على نتائج</p>';
+    return;
+  }
+
+  res.innerHTML = matched.map(u => {
+    const cc = calcCash(u.id);
+    const ci = calcInstallments(u.id);
+    const uTanks = appData.tankRecords.filter(r=>r.userId===u.id);
+    const uInstPay = appData.transactions.installments.filter(t=>t.userId===u.id);
+    const uCashPay = appData.transactions.cash.filter(t=>t.userId===u.id);
+
+    const cashRemDisplay = cc.cashTanksRemaining <= 0
+      ? '<span style="color:var(--green)">مكتمل ✅</span>'
+      : `<span style="color:var(--orange)">${cc.cashTanksRemaining} تنك (${fmtMoney(cc.cashMoneyRemaining)} د.أ)</span>`;
+
+    const instRemDisplay = ci.instTanksRemaining <= 0
+      ? '<span style="color:var(--green)">مكتمل ✅</span>'
+      : `<span style="color:var(--orange)">${ci.instTanksRemaining} تنك (${fmtMoney(ci.instMoneyRemaining)} د.أ)</span>`;
+
+    return `<div class="card">
+      <h3 class="card-title">👤 ${esc(u.name)} <code style="font-size:12px;color:var(--text3);font-weight:normal">ID: ${esc(u.id)}</code></h3>
+      <div class="summary-grid">
+        <div class="sum-item">
+          <div class="sum-label">💵 تنكات كاش</div>
+          <div class="sum-value" style="color:var(--gold)">${cc.totalCashTanks}</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">💵 مدفوع كاش</div>
+          <div class="sum-value" style="color:var(--green)">${fmtMoney(cc.totalCashPaid)} د.أ</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">💵 متبقي كاش</div>
+          <div class="sum-value">${cashRemDisplay}</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">📅 تنكات أقساط</div>
+          <div class="sum-value" style="color:var(--purple)">${ci.totalInstTanks}</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">📅 مدفوع أقساط</div>
+          <div class="sum-value" style="color:var(--green)">${fmtMoney(ci.totalInstPaid)} د.أ</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">📅 متبقي أقساط</div>
+          <div class="sum-value">${instRemDisplay}</div>
+        </div>
+      </div>
+
+      ${uTanks.length ? `
+        <div class="section-divider">🛢️ سجل التنكات</div>
+        <div class="table-wrapper"><table class="data-table">
+          <thead><tr><th>الدفعة</th><th>كاش</th><th>سعر كاش</th><th>أقساط</th><th>سعر أقساط</th><th>التاريخ</th></tr></thead>
+          <tbody>${uTanks.map(r=>`<tr>
+            <td>دفعة ${esc(r.batch)}</td>
+            <td style="color:var(--gold)">${r.cash}</td>
+            <td>${fmtMoney(r.cashPrice)} د.أ</td>
+            <td style="color:var(--purple)">${r.inst}</td>
+            <td>${fmtMoney(r.instPrice)} د.أ</td>
+            <td>${fmtDate(r.createdAt)}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>` : ''}
+
+      ${uCashPay.length ? `
+        <div class="section-divider">💵 مدفوعات الكاش</div>
+        <div class="table-wrapper"><table class="data-table">
+          <thead><tr><th>المبلغ</th><th>طريقة</th><th>التاريخ</th></tr></thead>
+          <tbody>${uCashPay.map(p=>`<tr>
+            <td>${fmtMoney(p.amount)} د.أ</td>
+            <td>${p.method==='electronic'?'💳':'💵'}</td>
+            <td>${fmtDate(p.createdAt)}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>` : ''}
+
+      ${uInstPay.length ? `
+        <div class="section-divider">📅 دفعات الأقساط</div>
+        <div class="table-wrapper"><table class="data-table">
+          <thead><tr><th>المبلغ</th><th>الشهر</th><th>طريقة</th><th>التاريخ</th></tr></thead>
+          <tbody>${uInstPay.map(p=>`<tr>
+            <td>${fmtMoney(p.amount)} د.أ</td>
+            <td>${esc(p.month)}</td>
+            <td>${p.method==='electronic'?'💳':'💵'}</td>
+            <td>${fmtDate(p.createdAt)}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ====================================================
+// SETTINGS
+// ====================================================
+function saveDelPass() {
+  const v = document.getElementById('delPassInput').value;
+  if (v.length < 4) { toast('4 أحرف على الأقل', 'error'); return; }
+  appData.settings.deletePassword = v;
+  saveData();
+  document.getElementById('delPassInput').value = '';
+  toast('تم حفظ كلمة السر ✓', 'success');
+}
+
+// ====================================================
+// EXPORT / IMPORT
+// ====================================================
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(appData, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `oil_cheese_backup_${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('تم تصدير البيانات ✓', 'success');
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.users || !parsed.transactions) {
+        toast('ملف غير صالح', 'error'); return;
+      }
+      showModal('📥 تأكيد الاستيراد',
+        '<p>سيتم استبدال جميع البيانات الحالية بالملف المستورد. هل أنت متأكد؟</p>',
+        () => {
+          appData = parsed;
+          saveData();
+          refreshUsersDL();
+          refreshBatchDropdown();
+          renderAll();
+          checkLatePayments();
+          toast('تم استيراد البيانات ✓', 'success');
+        }, '📥 استيراد');
+    } catch(err) {
+      toast('خطأ في قراءة الملف', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function exportCSV() {
+  const rows = [['النوع','ID','الاسم','المبلغ/العدد','التاريخ']];
+  appData.tankRecords.forEach(r => rows.push(['تنك',r.id,r.userName,`كاش:${r.cash} أقساط:${r.inst}`,r.createdAt]));
+  appData.transactions.installments.forEach(r => rows.push(['قسط',r.id,r.userName,r.amount,r.createdAt]));
+  appData.transactions.cash.forEach(r => rows.push(['كاش',r.id,r.userName,r.amount,r.createdAt]));
+  appData.cheese.forEach(r => rows.push(['جبنة',r.id,r.userName,`مدفوع:${r.paid} إجمالي:${r.total}`,r.createdAt]));
+  appData.otherTransfers.forEach(r => rows.push(['تحويل',r.id,r.desc,r.amount,r.createdAt]));
+
+  let csv = '\uFEFF';
+  rows.forEach(row => {
+    csv += row.map(v => {
+      let s = String(v==null?'':v);
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) s = '"' + s.replace(/"/g,'""') + '"';
+      return s;
+    }).join(',') + '\n';
+  });
+
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `oil_cheese_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('تم تصدير CSV ✓', 'success');
+}
+
+// ====================================================
+// COUNTER (backup reminder every 50 ops)
+// ====================================================
+function incCounter() {
+  appData.settings.opCounter = (appData.settings.opCounter || 0) + 1;
+  if (appData.settings.opCounter % 50 === 0) {
+    showModal('⚠️ تذكير نسخة احتياطية',
+      `<p>وصلت لـ <strong style="color:var(--green)">${appData.settings.opCounter}</strong> عملية. يُنصح بتصدير نسخة احتياطية الآن.</p>`,
+      () => exportBackup(), '💾 تصدير الآن');
+  }
+}
+
+// ====================================================
+// RENDER ALL
+// ====================================================
+function renderAll() {
+  renderStats();
+  renderTanks();
+  renderInstallments();
+  renderCash();
+  renderPurchases();
+  renderCheese();
+  renderTransfers();
+  renderBank();
+}
+
+// ====================================================
+// TABS
+// ====================================================
+function initTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+}
+
+// ====================================================
+// INIT — نقطة البداية الوحيدة
+// ====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();           // ① حمّل من localStorage أولاً
+  refreshUsersDL();     // ② حدّث قوائم الأسماء
+  refreshBatchDropdown(); // ③ حدّث قائمة الدفعات
+  renderAll();          // ④ ارسم الواجهة
+  initTabs();           // ⑤ ربط التبويبات
+  checkLatePayments();  // ⑥ تحقق من التأخر
+
+  // عرض كلمة السر الحالية في placeholder
+  document.getElementById('delPassInput').placeholder = '••••••';
+});
+</script>
 </body>
 </html>
