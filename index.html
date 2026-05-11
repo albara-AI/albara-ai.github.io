@@ -435,6 +435,23 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);background-image:radial
   <!-- ===== SETTINGS ===== -->
   <section class="tab-content" id="tab-settings">
     <div class="section-header"><h2>الإعدادات</h2></div>
+
+    <div class="card">
+      <h3 class="card-title">🔗 إعدادات Google Sheets</h3>
+      <p class="hint">أدخل رابط Apps Script ومفتاح الحماية للاتصال بقاعدة البيانات</p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>رابط Web App URL</label>
+          <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div class="form-group full">
+          <label>مفتاح الحماية (API Key)</label>
+          <input type="text" id="apiKeyInput" placeholder="نفس المفتاح في Code.gs">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveApiSettings()">💾 حفظ وتحميل</button>
+    </div>
+
     <div class="card">
       <h3 class="card-title">🔐 كلمة سر الحذف</h3>
       <div class="inline">
@@ -442,12 +459,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);background-image:radial
         <button class="btn btn-secondary" onclick="saveDelPass()">💾 حفظ</button>
       </div>
     </div>
+
     <div class="card">
-      <h3 class="card-title">📤 تصدير واستيراد البيانات</h3>
-      <p class="hint">استخدم هذه الأزرار لنقل البيانات بين الأجهزة يدوياً</p>
+      <h3 class="card-title">📤 تصدير البيانات</h3>
       <div class="export-btns">
-        <button class="btn btn-gold" onclick="exportBackup()">💾 تصدير JSON</button>
-        <label class="btn btn-secondary" style="cursor:pointer">📥 استيراد JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(event)"></label>
         <button class="btn btn-purple" onclick="exportCSV()">📊 تصدير CSV</button>
       </div>
     </div>
@@ -467,10 +482,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);background-image:radial
   </div>
 </div>
 
+<script src="app.js"></script>
 <script>
-// ====================================================
-// DATA STRUCTURE
-// ====================================================
+// placeholder - الكود في app.js
+if(false){
 const STORAGE_KEY = 'oilCheeseAppData';
 
 const DEFAULT_DATA = {
@@ -1408,17 +1423,7 @@ function initTabs() {
 // ====================================================
 // INIT — نقطة البداية الوحيدة
 // ====================================================
-document.addEventListener('DOMContentLoaded', () => {
-  loadData();           // ① حمّل من localStorage أولاً
-  refreshUsersDL();     // ② حدّث قوائم الأسماء
-  refreshBatchDropdown(); // ③ حدّث قائمة الدفعات
-  renderAll();          // ④ ارسم الواجهة
-  initTabs();           // ⑤ ربط التبويبات
-  checkLatePayments();  // ⑥ تحقق من التأخر
-
-  // عرض كلمة السر الحالية في placeholder
-  document.getElementById('delPassInput').placeholder = '••••••';
-});
+} // end placeholder
 </script>
 </body>
 </html>
