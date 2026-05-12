@@ -160,6 +160,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);background-image:radial
   <button class="tab-btn" data-tab="cash">💵 الكاش</button>
   <button class="tab-btn" data-tab="purchases">🚚 شراء الزيت</button>
   <button class="tab-btn" data-tab="cheese">🧀 الجبنة</button>
+  <button class="tab-btn" data-tab="cheeseDetails">🧀 تفاصيل الجبنة</button>
   <button class="tab-btn" data-tab="transfers">💸 تحويلات</button>
   <button class="tab-btn" data-tab="bank">🏦 رسائل البنك</button>
   <button class="tab-btn" data-tab="search">🔍 بحث</button>
@@ -367,6 +368,35 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);background-image:radial
     </div>
   </section>
 
+  <!-- ===== CHEESE DETAILS ===== -->
+<section class="tab-content" id="tab-cheeseDetails">
+  <div class="section-header"><h2>تفاصيل الجبنة (الأنصاف)</h2></div>
+  <div class="card">
+    <h3 class="card-title">➕ إضافة تفصيل</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>الاسم أو ID</label><input type="text" id="chd_nameId" list="usersDL" placeholder="اسم أو ID الزبون"></div>
+      <div class="form-group"><label>رقم الدفعة</label><input type="text" id="chd_batch" placeholder="نفس رقم دفعة الجبنة"></div>
+      <div class="form-group"><label>عدد الأنصاف</label><input type="number" id="chd_halves" min="1" placeholder="0"></div>
+      <div class="form-group"><label>مدفوع؟</label>
+        <select id="chd_isPaid"><option value="no">لا</option><option value="yes">نعم</option></select>
+      </div>
+      <div class="form-group"><label>طريقة الدفع</label>
+        <select id="chd_method"><option value="manual">💵 يدوي</option><option value="electronic">💳 إلكتروني</option></select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="addCheeseDetail()">💾 حفظ</button>
+  </div>
+  <div class="card">
+    <h3 class="card-title">📋 سجل التفاصيل</h3>
+    <div class="table-wrapper">
+      <table class="data-table" id="cheeseDetailsTable">
+        <thead><tr><th>TX ID</th><th>الاسم</th><th>الدفعة</th><th>الأنصاف</th><th>مدفوع؟</th><th>طريقة</th><th>التاريخ</th><th>حذف</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+  
   <!-- ===== TRANSFERS ===== -->
   <section class="tab-content" id="tab-transfers">
     <div class="section-header"><h2>التحويلات المالية الأخرى</h2><p>سجل مستقل لأي معاملة مالية أخرى</p></div>
