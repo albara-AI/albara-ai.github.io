@@ -13,6 +13,7 @@ const state = {
   cashPayments:   [],
   purchases:      [],
   cheese:         [],
+  cheeseDetails: [],
   otherTransfers: [],
   bankMessages:   [],
 };
@@ -49,6 +50,7 @@ async function loadAllData() {
     ['Cheese',       'cheese'],
     ['Transfers',    'otherTransfers'],
     ['BankMessages', 'bankMessages'],
+    ['CheeseDetails', 'cheeseDetails'],
   ];
   for (const [sheet, key] of map) {
     const r = await callApi('getAll', sheet);
@@ -850,6 +852,7 @@ function renderAll() {
   renderCash();
   renderPurchases();
   renderCheese();
+  renderCheeseDetails(); // ← أضف هذا
   renderTransfers();
   renderBank();
 }
@@ -1082,6 +1085,69 @@ function initTabs() {
       if (tab) tab.classList.add('active');
     });
   });
+}
+
+
+// ====================================================
+// CHEESE DETAILS
+// ====================================================
+async function addCheeseDetail() {
+  const nameOrId = document.getElementById('chd_nameId').value.trim();
+  const batch    = document.getElementById('chd_batch').value.trim();
+  const halves   = parseInt(document.getElementById('chd_halves').value);
+  const isPaid   = document.getElementById('chd_isPaid').value;
+  const method   = document.getElementById('chd_method').value;
+
+  if (!nameOrId)               { showToast('أدخل الاسم أو ID', 'error'); return; }
+  if (!batch)                  { showToast('أدخل رقم الدفعة', 'error'); return; }
+  if (isNaN(halves) || halves <= 0) { showToast('أدخل عدد أنصاف صحيح', 'error'); return; }
+
+  const user = await getOrCreateUser(nameOrId);
+  if (!user) return;
+
+  const rec = {
+    transactionId: genTxId('CD'),
+    userId:        user.userId,
+    userName:      user.name,
+    batchNumber:   batch,
+    halvesCount:   halves,
+    isPaid:        isPaid,
+    paymentMethod: method,
+    createdAt:     nowISO()
+  };
+
+  const r = await callApi('add', 'CheeseDetails', { data: rec });
+  if (r.success) {
+    state.cheeseDetails.push(rec);
+    renderCheeseDetails();
+    document.getElementById('chd_nameId').value = '';
+    document.getElementById('chd_batch').value  = '';
+    document.getElementById('chd_halves').value = '';
+    showToast(`تم تسجيل ${halves} نصف ✓`, 'success');
+  } else {
+    showToast('فشل الحفظ: ' + (r.error || ''), 'error');
+  }
+}
+
+function renderCheeseDetails() {
+  const tbody = document.querySelector('#cheeseDetailsTable tbody');
+  if (!tbody) return;
+  const recs = [...state.cheeseDetails].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  tbody.innerHTML = !recs.length
+    ? '<tr><td colspan="8" class="empty">لا توجد بيانات</td></tr>'
+    : recs.map(r => `<tr>
+        <td><code style="font-size:11px">${safeStr(r.transactionId)}</code></td>
+        <td><strong>${safeStr(r.userName)}</strong></td>
+        <td><code>${safeStr(r.batchNumber)}</code></td>
+        <td>${parseInt(r.halvesCount) || 0}</td>
+        <td>${r.isPaid === 'yes'
+          ? '<span style="color:var(--green)">✓ نعم</span>'
+          : '<span style="color:var(--orange)">✗ لا</span>'}</td>
+        <td>${r.paymentMethod === 'electronic' ? '💳' : '💵'}</td>
+        <td>${fmtDate(r.createdAt)}</td>
+        <td><button class="btn-icon"
+              onclick="askDelete('CheeseDetails','${r.transactionId}','cheeseDetails')">🗑️</button></td>
+      </tr>`).join('');
 }
 
 // ====================================================
